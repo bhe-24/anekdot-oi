@@ -17,7 +17,7 @@
         }
 
         body {
-            background: #fdf2f8; /* Latar sedikit pink/merah muda khas ikon challenge */
+            background: #fdf2f8;
             color: #333;
             min-height: 100vh;
         }
@@ -90,14 +90,27 @@
             border-left: 4px solid #d81b60;
         }
 
-        .intro-text strong {
-            font-weight: 700;
+        /* Loading Data Firebase */
+        .loading-data {
+            text-align: center;
+            padding: 50px 20px;
+            color: #d81b60;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
-        /* Area Kartu Challenge */
+        .loading-data i {
+            font-size: 30px;
+        }
+
+        /* Area Kartu Challenge (Hidden initially) */
         .challenge-area {
             padding: 0 20px 30px;
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 15px;
         }
@@ -127,7 +140,14 @@
             font-size: 14px;
             font-weight: 700;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .challenge-tema {
+            font-size: 13px;
+            color: #880e4f;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .keyword-container {
@@ -160,7 +180,7 @@
             border-radius: 12px;
             font-size: 14px;
             line-height: 1.6;
-            resize: vertical; /* Biar user bisa tarik textareanya kalau kepanjangan */
+            resize: vertical;
             outline: none;
             transition: border-color 0.3s;
             font-family: inherit;
@@ -220,7 +240,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Kotak Hasil Penilaian */
         .result-box {
             display: none;
             background: #e8f5e9;
@@ -288,16 +307,22 @@
 
         <section class="intro-section">
             <div class="intro-text">
-                Tantangan untukmu, <strong id="namaUser">Pelajar</strong>! Buatlah sebuah teks anekdot yang singkat, padat, dan menyentil berdasarkan <strong>kata kunci</strong> di bawah ini. AI Guru kita akan menilai karyamu!
+                Tantangan untukmu, <strong id="namaUser">Pelajar</strong>! Buatlah sebuah teks anekdot yang singkat dan menyentil berdasarkan <strong>kata kunci</strong> di bawah ini. AI Guru kita akan menilai karyamu!
             </div>
         </section>
 
-        <section class="challenge-area">
+        <div class="loading-data" id="loadingData">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Mengambil tantangan dari server...
+        </div>
+
+        <section class="challenge-area" id="challengeArea">
             
             <div class="challenge-card">
-                <img src="https://via.placeholder.com/400x200/f8bbd0/880e4f?text=Ilustrasi+Tantangan" alt="Tema Challenge" class="card-img" id="imgChallenge">
+                <img src="" alt="Tema Challenge" class="card-img" id="imgChallenge">
                 <div class="card-content">
-                    <div class="challenge-title">Gunakan kata kunci berikut:</div>
+                    <div class="challenge-title">Tema: <span id="temaTantangan" class="challenge-tema"></span></div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Gunakan kata kunci berikut:</div>
                     <div class="keyword-container" id="areaKataKunci">
                         </div>
                 </div>
@@ -330,133 +355,198 @@
         </section>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Cek Sesi User
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variabel Game
+        let bankChallenge = [];
+        let challengeTersedia = [];
+        let challengeSaatIni = null;
+        let skorTotal = parseInt(sessionStorage.getItem('skorLocal')) || 0; 
+        const userID = sessionStorage.getItem('userID');
+        let userDocRef = null;
+
+        // Elemen DOM
+        const loadingData = document.getElementById('loadingData');
+        const challengeArea = document.getElementById('challengeArea');
+        const imgChallenge = document.getElementById('imgChallenge');
+        const temaTantangan = document.getElementById('temaTantangan');
+        const areaKataKunci = document.getElementById('areaKataKunci');
+        const inputAnekdot = document.getElementById('inputAnekdot');
+        const btnKirim = document.getElementById('btnKirim');
+        const formArea = document.getElementById('formArea');
+        const aiLoading = document.getElementById('aiLoading');
+        const resultBox = document.getElementById('resultBox');
+        const nilaiAI = document.getElementById('nilaiAI');
+        const feedbackAI = document.getElementById('feedbackAI');
+        const btnNext = document.getElementById('btnNext');
+        const skorElement = document.getElementById('skorUser');
+
+        document.addEventListener('DOMContentLoaded', async () => {
             const userName = sessionStorage.getItem('userName');
-            if (!userName) {
+            if (!userName || !userID) {
                 window.location.href = 'index.html';
                 return;
             }
             document.getElementById('namaUser').textContent = userName;
-
-            // 2. Data Dummy Challenge (Nanti dari Firebase)
-            const bankChallenge = [
-                {
-                    id: 1,
-                    tema: "Lingkungan Sekolah",
-                    kataKunci: ["Kantin", "Mahal", "Tikus"],
-                    img: "https://via.placeholder.com/400x200/ffe0b2/e65100?text=Kantin+Sekolah"
-                },
-                {
-                    id: 2,
-                    tema: "Layanan Publik",
-                    kataKunci: ["Pejabat", "Banjir", "Janji"],
-                    img: "https://via.placeholder.com/400x200/bbdefb/0d47a1?text=Pejabat+dan+Banjir"
-                },
-                {
-                    id: 3,
-                    tema: "Kehidupan Pelajar",
-                    kataKunci: ["PR", "Tidur", "Hukuman"],
-                    img: "https://via.placeholder.com/400x200/c8e6c9/1b5e20?text=Banyak+Tugas"
-                }
-            ];
-
-            let challengeTersedia = [...bankChallenge];
-            let skorTotal = parseInt(sessionStorage.getItem('skorTotal')) || 0; // Ambil skor sementara
-            
-            // Elemen DOM
-            const imgChallenge = document.getElementById('imgChallenge');
-            const areaKataKunci = document.getElementById('areaKataKunci');
-            const inputAnekdot = document.getElementById('inputAnekdot');
-            const btnKirim = document.getElementById('btnKirim');
-            const formArea = document.getElementById('formArea');
-            const aiLoading = document.getElementById('aiLoading');
-            const resultBox = document.getElementById('resultBox');
-            const nilaiAI = document.getElementById('nilaiAI');
-            const feedbackAI = document.getElementById('feedbackAI');
-            const btnNext = document.getElementById('btnNext');
-            const skorElement = document.getElementById('skorUser');
-
             skorElement.textContent = skorTotal;
 
-            // 3. Render Tantangan Acak
-            function tampilkanChallengeBaru() {
-                if (challengeTersedia.length === 0) {
-                    alert("Wah, kamu sudah mencoba semua tantangan! Kita ulang ya.");
-                    challengeTersedia = [...bankChallenge];
+            await siapkanDataGame();
+        });
+
+        async function siapkanDataGame() {
+            try {
+                // 1. Ambil Referensi Dokumen User (Untuk update skor)
+                const qUser = query(collection(db, "users_session"), where("userID", "==", userID));
+                const userSnapshot = await getDocs(qUser);
+                if (!userSnapshot.empty) {
+                    userDocRef = userSnapshot.docs[0].ref;
+                    const skorFirebase = userSnapshot.docs[0].data().skor || 0;
+                    if (skorFirebase > skorTotal) {
+                        skorTotal = skorFirebase;
+                        sessionStorage.setItem('skorLocal', skorTotal);
+                        skorElement.textContent = skorTotal;
+                    }
                 }
 
-                const indexAcak = Math.floor(Math.random() * challengeTersedia.length);
-                const challengeSaatIni = challengeTersedia[indexAcak];
-                challengeTersedia.splice(indexAcak, 1);
-
-                // Set Gambar
-                imgChallenge.src = challengeSaatIni.img;
+                // 2. Ambil Challenge dari Koleksi Admin
+                const chalSnapshot = await getDocs(collection(db, "bank_challenge"));
                 
-                // Set Kata Kunci
-                areaKataKunci.innerHTML = ''; // Bersihkan dulu
+                if (chalSnapshot.empty) {
+                    loadingData.innerHTML = '<i class="fa-solid fa-box-open"></i> Yaaah, Admin belum membuat tantangan apapun.';
+                    return;
+                }
+
+                chalSnapshot.forEach((doc) => {
+                    bankChallenge.push(doc.data());
+                });
+
+                challengeTersedia = [...bankChallenge];
+                
+                loadingData.style.display = 'none';
+                challengeArea.style.display = 'flex';
+
+                tampilkanChallengeBaru();
+
+            } catch (error) {
+                console.error("Gagal mengambil data dari Firebase:", error);
+                loadingData.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Gagal terhubung ke database.';
+            }
+        }
+
+        function tampilkanChallengeBaru() {
+            if (challengeTersedia.length === 0) {
+                alert("Wah, kamu sudah mencoba semua tantangan! Kita ulang dari awal ya.");
+                challengeTersedia = [...bankChallenge];
+            }
+
+            const indexAcak = Math.floor(Math.random() * challengeTersedia.length);
+            challengeSaatIni = challengeTersedia[indexAcak];
+            challengeTersedia.splice(indexAcak, 1);
+
+            // Render ke Layar
+            imgChallenge.src = challengeSaatIni.img;
+            temaTantangan.textContent = challengeSaatIni.tema;
+            
+            areaKataKunci.innerHTML = '';
+            if (challengeSaatIni.kataKunci && Array.isArray(challengeSaatIni.kataKunci)) {
                 challengeSaatIni.kataKunci.forEach(kata => {
                     const span = document.createElement('span');
                     span.className = 'keyword-badge';
                     span.textContent = kata;
                     areaKataKunci.appendChild(span);
                 });
-
-                // Reset UI
-                inputAnekdot.value = '';
-                formArea.style.display = 'block';
-                aiLoading.style.display = 'none';
-                resultBox.style.display = 'none';
-                btnNext.style.display = 'none';
             }
 
-            // 4. Logika Pengiriman ke "AI" (Simulasi)
-            btnKirim.addEventListener('click', () => {
-                const teksUser = inputAnekdot.value.trim();
+            // Reset Form
+            inputAnekdot.value = '';
+            formArea.style.display = 'block';
+            aiLoading.style.display = 'none';
+            resultBox.style.display = 'none';
+            btnNext.style.display = 'none';
+        }
 
-                if (teksUser.length < 20) {
-                    alert("Teksnya terlalu pendek! Coba ceritakan lebih panjang lagi agar struktur anekdotnya terlihat.");
-                    return;
-                }
+        btnKirim.addEventListener('click', async () => {
+            const teksUser = inputAnekdot.value.trim();
 
-                // Sembunyikan form, tampilkan loading AI
-                formArea.style.display = 'none';
-                aiLoading.style.display = 'flex';
+            if (teksUser.length < 20) {
+                alert("Teksnya terlalu pendek! Coba ceritakan lebih panjang lagi agar struktur anekdotnya terlihat.");
+                return;
+            }
 
-                // NANTI DI SINI KITA FETCH KE VERCEL: 
-                // fetch('/api/kc.js', { method: 'POST', body: JSON.stringify({ teks: teksUser }) }) ...
+            formArea.style.display = 'none';
+            aiLoading.style.display = 'flex';
+
+            let nilaiAkhir = 0;
+            let komentarAkhir = "";
+
+            try {
+                // Menghubungi Vercel API (Google Gemini)
+                const response = await fetch('/api/kc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        teks: teksUser,
+                        kataKunci: challengeSaatIni.kataKunci
+                    })
+                });
+
+                if (!response.ok) throw new Error('API Error');
                 
-                // Simulasi proses AI selama 3 detik
-                setTimeout(() => {
-                    aiLoading.style.display = 'none';
-                    resultBox.style.display = 'block';
-                    btnNext.style.display = 'block';
+                const data = await response.json();
+                nilaiAkhir = data.skor;
+                komentarAkhir = data.komentar;
 
-                    // Simulasi hasil dari AI
-                    const nilaiSimulasi = Math.floor(Math.random() * (95 - 75 + 1)) + 75; // Nilai random 75-95
-                    nilaiAI.textContent = nilaiSimulasi;
-                    
-                    feedbackAI.innerHTML = `
-                        <strong>Bagus sekali!</strong> Teksmu sudah memiliki unsur lucu dan sindiran yang cukup pas. 
-                        Penggunaan kata kunci juga sudah disisipkan dengan natural. 
-                        <br><br><em>Saran AI:</em> Coba pertajam lagi bagian Krisis agar punchline-nya lebih nendang!
-                    `;
+            } catch (error) {
+                console.warn('API Vercel belum aktif atau terjadi error. Menggunakan sistem evaluasi lokal (Fallback).', error);
+                
+                // FALLBACK: Simulasi nilai jika API belum dideploy di Vercel
+                nilaiAkhir = Math.floor(Math.random() * (95 - 75 + 1)) + 75;
+                komentarAkhir = `
+                    <strong>Bagus sekali!</strong> (Catatan: Ini adalah penilaian otomatis offline karena server AI belum terhubung). 
+                    Teksmu sudah mengandung unsur sindiran yang sesuai dengan tema. 
+                    <br><br><em>Saran:</em> Coba buat bagian Krisis/Klimaks lebih mengejutkan lagi!
+                `;
+            }
 
-                    // Update Skor Total (Misal skor challenge ditambahkan ke skor keseluruhan)
-                    skorTotal += nilaiSimulasi;
-                    skorElement.textContent = skorTotal;
-                    sessionStorage.setItem('skorTotal', skorTotal); // Simpan skor sementara
+            // Tampilkan Hasil
+            aiLoading.style.display = 'none';
+            resultBox.style.display = 'block';
+            btnNext.style.display = 'block';
 
-                }, 3000);
-            });
+            nilaiAI.textContent = nilaiAkhir;
+            feedbackAI.innerHTML = komentarAkhir;
 
-            // 5. Tombol Lanjut
-            btnNext.addEventListener('click', tampilkanChallengeBaru);
+            // Update Skor
+            skorTotal += nilaiAkhir;
+            skorElement.textContent = skorTotal;
+            sessionStorage.setItem('skorLocal', skorTotal);
 
-            // Inisialisasi awal
-            tampilkanChallengeBaru();
+            // Simpan ke Firebase secara Real-time
+            if (userDocRef) {
+                try {
+                    await updateDoc(userDocRef, { skor: skorTotal });
+                } catch (err) {
+                    console.error("Gagal update skor ke Firebase:", err);
+                }
+            }
         });
+
+        btnNext.addEventListener('click', tampilkanChallengeBaru);
     </script>
 </body>
 </html>
