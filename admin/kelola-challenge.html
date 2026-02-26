@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Kartu Challenge - Anekdot.io</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn-back {
+            color: #94a3b8;
+            font-size: 20px;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: color 0.2s;
+        }
+
+        .btn-back:hover {
+            color: white;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 16px;
+            flex-grow: 1;
+        }
+
+        /* Layout Konten */
+        .content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .content {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* Form Styling */
+        .card-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .input-group input:focus {
+            border-color: #ec4899; /* Warna pink khas menu challenge */
+        }
+
+        .input-group .hint {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .input-group input[type="file"] {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #ec4899; /* Pink */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #db2777;
+        }
+
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Daftar Challenge */
+        .challenge-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .challenge-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .challenge-tema {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .keyword-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .keyword-badge {
+            background: #fdf2f8;
+            color: #db2777;
+            border: 1px solid #fbcfe8;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .challenge-images img {
+            width: 80px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            margin-top: 5px;
+        }
+
+        .btn-hapus {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-hapus:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Loading Overlay */
+        #loadingStatus {
+            display: none;
+            color: #ec4899;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Kelola Kartu Challenge</div>
+        </header>
+
+        <div class="content">
+            <div class="card-box" style="height: fit-content;">
+                <div class="card-title">
+                    <i class="fa-solid fa-plus-circle" style="color:#ec4899;"></i> Tambah Tantangan Baru
+                </div>
+                
+                <form id="formTambahChallenge">
+                    <div class="input-group">
+                        <label>Tema Cerita</label>
+                        <input type="text" id="inputTema" placeholder="Contoh: Lingkungan Sekolah" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Kata Kunci</label>
+                        <input type="text" id="inputKataKunci" placeholder="Contoh: Kantin, Tikus, Mahal" required>
+                        <div class="hint">*Pisahkan setiap kata dengan tanda koma (,)</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Gambar Ilustrasi - Opsional</label>
+                        <input type="file" id="fileImgChallenge" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSimpan">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Simpan ke Database
+                    </button>
+                    <div id="loadingStatus"><i class="fa-solid fa-spinner fa-spin"></i> Memproses & mengunggah...</div>
+                </form>
+            </div>
+
+            <div class="card-box">
+                <div class="card-title">
+                    <i class="fa-solid fa-database" style="color:#059669;"></i> Daftar Tantangan Aktif
+                </div>
+                
+                <div class="challenge-list" id="daftarChallenge">
+                    <div style="text-align: center; color: #94a3b8; font-size: 13px; padding: 20px;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Memuat data...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // API Key ImgBB
+        const IMGBB_API_KEY = "2f45fcafb6dfb2dbae295499022ce476";
+
+        // Elemen DOM
+        const form = document.getElementById('formTambahChallenge');
+        const btnSimpan = document.getElementById('btnSimpan');
+        const loadingStatus = document.getElementById('loadingStatus');
+        const daftarChallenge = document.getElementById('daftarChallenge');
+
+        // 1. Fungsi Mengunggah Gambar ke ImgBB
+        async function uploadKeImgBB(fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return null;
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    return data.data.url;
+                } else {
+                    throw new Error('Gagal mengunggah ke ImgBB');
+                }
+            } catch (error) {
+                console.error("Error ImgBB:", error);
+                return null;
+            }
+        }
+
+        // 2. Logika Menyimpan Challenge
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tema = document.getElementById('inputTema').value.trim();
+            const kataKunciMentah = document.getElementById('inputKataKunci').value;
+            
+            // Memecah string berdasarkan koma, dan membersihkan spasi berlebih
+            // Contoh: "Kantin,  Mahal , Tikus" -> ["Kantin", "Mahal", "Tikus"]
+            const arrayKataKunci = kataKunciMentah.split(',').map(kata => kata.trim()).filter(kata => kata !== "");
+
+            if (arrayKataKunci.length === 0) {
+                alert("Harap masukkan minimal 1 kata kunci.");
+                return;
+            }
+
+            btnSimpan.disabled = true;
+            loadingStatus.style.display = 'block';
+
+            try {
+                let urlImg = await uploadKeImgBB(document.getElementById('fileImgChallenge'));
+
+                // Gambar default jika admin tidak mengunggah
+                if (!urlImg) urlImg = "https://via.placeholder.com/400x200/f8bbd0/880e4f?text=Ilustrasi+Tantangan";
+
+                // Simpan ke Firestore koleksi "bank_challenge"
+                await addDoc(collection(db, "bank_challenge"), {
+                    tema: tema,
+                    kataKunci: arrayKataKunci, // Disimpan sebagai Array
+                    img: urlImg,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("Tantangan berhasil ditambahkan!");
+                form.reset();
+                muatDaftarChallenge();
+
+            } catch (error) {
+                console.error("Error menambah challenge:", error);
+                alert("Terjadi kesalahan saat menyimpan data.");
+            } finally {
+                btnSimpan.disabled = false;
+                loadingStatus.style.display = 'none';
+            }
+        });
+
+        // 3. Fungsi Menampilkan Challenge dari Firestore
+        async function muatDaftarChallenge() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "bank_challenge"));
+                
+                if (querySnapshot.empty) {
+                    daftarChallenge.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 13px;">Belum ada tantangan. Silakan tambahkan.</div>';
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Merender array kata kunci menjadi elemen HTML (badge)
+                    let badgesHtml = '';
+                    if (data.kataKunci && Array.isArray(data.kataKunci)) {
+                        data.kataKunci.forEach(kata => {
+                            badgesHtml += `<span class="keyword-badge">${kata}</span>`;
+                        });
+                    }
+
+                    html += `
+                        <div class="challenge-item">
+                            <div class="challenge-header">
+                                <div>
+                                    <div class="challenge-tema">${data.tema}</div>
+                                    <div class="keyword-container">
+                                        ${badgesHtml}
+                                    </div>
+                                </div>
+                                <button class="btn-hapus" onclick="hapusChallenge('${doc.id}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="challenge-images">
+                                <img src="${data.img}" alt="Ilustrasi" title="Gambar Ilustrasi">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                daftarChallenge.innerHTML = html;
+
+            } catch (error) {
+                console.error("Gagal memuat challenge:", error);
+                daftarChallenge.innerHTML = '<div style="color: #ef4444; font-size: 13px;">Gagal memuat data.</div>';
+            }
+        }
+
+        // 4. Fungsi Menghapus Challenge
+        window.hapusChallenge = async function(id) {
+            if (confirm("Yakin ingin menghapus tantangan ini?")) {
+                try {
+                    await deleteDoc(doc(db, "bank_challenge", id));
+                    muatDaftarChallenge();
+                } catch (error) {
+                    console.error("Error menghapus:", error);
+                    alert("Gagal menghapus tantangan.");
+                }
+            }
+        };
+
+        // Keamanan & Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+            muatDaftarChallenge();
+        });
+    </script>
+</body>
+</html>
