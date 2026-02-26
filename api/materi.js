@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         // Menerima instruksi (prompt) dari database/admin
         const { topikMateri, instruksiKhusus } = req.body;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const promptSystem = `
         Kamu adalah penulis materi edukasi digital yang sangat asyik dan interaktif untuk anak SMA kelas 10.
