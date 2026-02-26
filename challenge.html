@@ -9,289 +9,90 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: #fdf2f8;
-            color: #333;
-            min-height: 100vh;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #fdf2f8; color: #333; min-height: 100vh; }
 
         .app-container {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
+            background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative; display: flex; flex-direction: column;
         }
 
-        /* Header */
         header {
-            background: #fff;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: #fff; padding: 15px 20px; display: flex; align-items: center;
+            border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;
         }
 
-        .btn-back {
-            color: #555;
-            font-size: 20px;
-            text-decoration: none;
-            margin-right: 15px;
-        }
-
-        .header-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #d81b60;
-            flex-grow: 1;
-        }
-
+        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; }
+        .header-title { font-weight: 600; font-size: 16px; color: #d81b60; flex-grow: 1; }
         .poin-badge {
-            background: #ffb300;
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            background: #ffb300; color: #fff; padding: 5px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 700;
+            display: flex; align-items: center; gap: 5px;
         }
 
-        /* Pengantar */
-        .intro-section {
-            padding: 20px;
-            background: linear-gradient(to bottom, #fce4ec, #fff);
-        }
-
+        .intro-section { padding: 20px; background: linear-gradient(to bottom, #fce4ec, #fff); }
         .intro-text {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8bbd0;
-            color: #880e4f;
-            border-radius: 12px;
-            border-left: 4px solid #d81b60;
+            font-size: 13px; color: #880e4f; line-height: 1.6; padding: 15px;
+            background: #f8bbd0; border-radius: 12px; border-left: 4px solid #d81b60;
         }
 
-        /* Loading Data Firebase */
-        .loading-data {
-            text-align: center;
-            padding: 50px 20px;
-            color: #d81b60;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
+        .challenge-area { padding: 0 20px 30px; display: none; flex-direction: column; gap: 15px; align-items: center;}
 
-        .loading-data i {
-            font-size: 30px;
-        }
-
-        /* Area Kartu Challenge (Hidden initially) */
-        .challenge-area {
-            padding: 0 20px 30px;
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        /* KARTU CHALLENGE PORTRAIT */
         .challenge-card {
-            width: 100%;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            overflow: hidden;
-            border: 1px solid #fce4ec;
+            width: 100%; max-width: 280px; min-height: 380px;
+            background: #fff; border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(216, 27, 96, 0.1);
+            overflow: hidden; border: 1px solid #fce4ec; margin: 10px 0;
+            display: flex; flex-direction: column;
         }
 
-        .card-img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            background: #eee;
-        }
+        .card-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+        .card-content { padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center;}
+        .challenge-title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 5px; }
+        .challenge-tema { font-size: 15px; color: #d81b60; margin-bottom: 12px; font-weight: 700; display: block;}
+        .keyword-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+        .keyword-badge { background: #d81b60; color: white; padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: 600; }
 
-        .card-content {
-            padding: 15px;
-            text-align: center;
-        }
-
-        .challenge-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .challenge-tema {
-            font-size: 13px;
-            color: #880e4f;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .keyword-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .keyword-badge {
-            background: #d81b60;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        /* Area Penulisan */
-        .textarea-container {
-            width: 100%;
-        }
-
+        .textarea-container { width: 100%; }
         .input-anekdot {
-            width: 100%;
-            min-height: 180px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.3s;
-            font-family: inherit;
+            width: 100%; min-height: 150px; padding: 15px; border: 2px solid #ddd;
+            border-radius: 15px; font-size: 14px; outline: none; transition: 0.3s;
         }
-
-        .input-anekdot:focus {
-            border-color: #d81b60;
-            box-shadow: 0 0 8px rgba(216, 27, 96, 0.1);
-        }
+        .input-anekdot:focus { border-color: #d81b60; }
 
         .btn-kirim {
-            width: 100%;
-            padding: 15px;
-            background: #d81b60;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
-            transition: background 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            width: 100%; padding: 15px; background: #d81b60; color: white;
+            border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+            margin-top: 10px; cursor: pointer;
         }
 
-        .btn-kirim:hover {
-            background: #ad144d;
-        }
-
-        /* Status & Feedback AI */
-        .ai-status {
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            color: #555;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 20px 0;
-        }
-
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #d81b60;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .ai-status { text-align: center; padding: 20px 0; display: none; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #d81b60;}
+        .spinner { width: 30px; height: 30px; border: 4px solid #fce4ec; border-top: 4px solid #d81b60; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .result-box {
-            display: none;
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: left;
-            margin-top: 10px;
+            display: none; background: #f0fdf4; border: 2px solid #4caf50;
+            border-radius: 15px; padding: 15px; margin-top: 10px;
         }
+        .result-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dcfce7; padding-bottom: 8px; margin-bottom: 10px; }
+        .result-score { background: #4caf50; color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; }
+        .result-feedback { font-size: 13px; line-height: 1.5; color: #166534; }
 
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
+        .btn-next { width: 100%; padding: 13px; margin-top: 15px; background: #4caf50; color: white; border: none; border-radius: 12px; font-weight: 600; display: none; cursor: pointer;}
 
-        .result-title {
-            font-weight: 700;
-            color: #2e7d32;
-            font-size: 14px;
+        /* CUSTOM MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; align-items: center;
+            justify-content: center; z-index: 2000;
         }
+        .modal-box { background: #fff; padding: 30px; border-radius: 25px; max-width: 320px; width: 90%; text-align: center; }
+        .modal-box i { font-size: 50px; color: #d81b60; margin-bottom: 15px; }
+        .btn-modal { background: #d81b60; color: #fff; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 600; margin-top: 20px; cursor: pointer;}
 
-        .result-score {
-            background: #4caf50;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .result-feedback {
-            font-size: 13px;
-            color: #333;
-            line-height: 1.5;
-        }
-
-        .btn-next {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            background: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            display: none;
-        }
+        .loading-data { text-align: center; padding: 100px 20px; color: #d81b60; font-weight: 600;}
     </style>
 </head>
 <body>
@@ -307,59 +108,59 @@
 
         <section class="intro-section">
             <div class="intro-text">
-                Tantangan untukmu, <strong id="namaUser">Pelajar</strong>! Buatlah sebuah teks anekdot yang singkat dan menyentil berdasarkan <strong>kata kunci</strong> di bawah ini. AI Guru kita akan menilai karyamu!
+                Tantangan untukmu! Buatlah teks anekdot singkat berdasarkan <strong>kata kunci</strong>. Jangan asal tulis ya!
             </div>
         </section>
 
         <div class="loading-data" id="loadingData">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Mengambil tantangan dari server...
+            <i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Menghubungkan ke server...
         </div>
 
         <section class="challenge-area" id="challengeArea">
-            
             <div class="challenge-card">
-                <img src="" alt="Tema Challenge" class="card-img" id="imgChallenge">
+                <img src="" id="imgChallenge" class="card-img" alt="Tema">
                 <div class="card-content">
-                    <div class="challenge-title">Tema: <span id="temaTantangan" class="challenge-tema"></span></div>
-                    <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Gunakan kata kunci berikut:</div>
-                    <div class="keyword-container" id="areaKataKunci">
-                        </div>
+                    <div class="challenge-title">Tema:</div>
+                    <strong id="temaTantangan" class="challenge-tema"></strong>
+                    <div class="keyword-container" id="areaKataKunci"></div>
                 </div>
             </div>
 
             <div class="textarea-container" id="formArea">
-                <textarea id="inputAnekdot" class="input-anekdot" placeholder="Ketik teks anekdot buatanmu di sini..."></textarea>
-                <button class="btn-kirim" id="btnKirim">
-                    <i class="fa-solid fa-robot"></i> Minta AI Menilai
-                </button>
+                <textarea id="inputAnekdot" class="input-anekdot" placeholder="Tulis teks anekdotmu di sini..."></textarea>
+                <button class="btn-kirim" id="btnKirim"><i class="fa-solid fa-robot"></i> Minta AI Menilai</button>
             </div>
 
             <div class="ai-status" id="aiLoading">
                 <div class="spinner"></div>
-                <div>AI Guru sedang membaca dan menganalisis karyamu...</div>
+                <div>Guru AI sedang membaca karyamu...</div>
             </div>
 
             <div class="result-box" id="resultBox">
                 <div class="result-header">
-                    <div class="result-title"><i class="fa-solid fa-check-double"></i> Hasil Evaluasi AI</div>
-                    <div class="result-score">Nilai: <span id="nilaiAI">0</span>/100</div>
+                    <div style="font-weight: 700; color: #166534;"><i class="fa-solid fa-robot"></i> Evaluasi Guru AI</div>
+                    <div class="result-score"><span id="nilaiAI">0</span></div>
                 </div>
-                <div class="result-feedback" id="feedbackAI">
-                    Memuat komentar AI...
-                </div>
+                <div class="result-feedback" id="feedbackAI"></div>
             </div>
 
-            <button class="btn-next" id="btnNext">Lanjut Tantangan Berikutnya <i class="fa-solid fa-arrow-right"></i></button>
-
+            <button class="btn-next" id="btnNext">Tantangan Lain <i class="fa-solid fa-arrow-right"></i></button>
         </section>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <h3>Mantap!</h3>
+            <p>Semua tantangan sudah kamu selesaikan. Mau coba lagi dari awal?</p>
+            <button class="btn-modal" id="btnTutupModal">Oke, Sikat!</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
             authDomain: "juararc-503f9.firebaseapp.com",
@@ -372,7 +173,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Variabel Game
         let bankChallenge = [];
         let challengeTersedia = [];
         let challengeSaatIni = null;
@@ -380,99 +180,66 @@
         const userID = sessionStorage.getItem('userID');
         let userDocRef = null;
 
-        // Elemen DOM
         const loadingData = document.getElementById('loadingData');
         const challengeArea = document.getElementById('challengeArea');
-        const imgChallenge = document.getElementById('imgChallenge');
-        const temaTantangan = document.getElementById('temaTantangan');
-        const areaKataKunci = document.getElementById('areaKataKunci');
         const inputAnekdot = document.getElementById('inputAnekdot');
         const btnKirim = document.getElementById('btnKirim');
         const formArea = document.getElementById('formArea');
         const aiLoading = document.getElementById('aiLoading');
         const resultBox = document.getElementById('resultBox');
-        const nilaiAI = document.getElementById('nilaiAI');
-        const feedbackAI = document.getElementById('feedbackAI');
         const btnNext = document.getElementById('btnNext');
         const skorElement = document.getElementById('skorUser');
+        const modalOverlay = document.getElementById('modalOverlay');
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const userName = sessionStorage.getItem('userName');
-            if (!userName || !userID) {
-                window.location.href = 'index.html';
-                return;
-            }
-            document.getElementById('namaUser').textContent = userName;
+        async function init() {
+            if (!userID) { window.location.href = 'index.html'; return; }
             skorElement.textContent = skorTotal;
 
-            await siapkanDataGame();
-        });
-
-        async function siapkanDataGame() {
             try {
-                // 1. Ambil Referensi Dokumen User (Untuk update skor)
                 const qUser = query(collection(db, "users_session"), where("userID", "==", userID));
-                const userSnapshot = await getDocs(qUser);
-                if (!userSnapshot.empty) {
-                    userDocRef = userSnapshot.docs[0].ref;
-                    const skorFirebase = userSnapshot.docs[0].data().skor || 0;
-                    if (skorFirebase > skorTotal) {
-                        skorTotal = skorFirebase;
-                        sessionStorage.setItem('skorLocal', skorTotal);
-                        skorElement.textContent = skorTotal;
-                    }
-                }
+                const userSnap = await getDocs(qUser);
+                if (!userSnap.empty) userDocRef = userSnap.docs[0].ref;
 
-                // 2. Ambil Challenge dari Koleksi Admin
-                const chalSnapshot = await getDocs(collection(db, "bank_challenge"));
+                const chalSnap = await getDocs(collection(db, "bank_challenge"));
+                chalSnap.forEach(doc => bankChallenge.push(doc.data()));
                 
-                if (chalSnapshot.empty) {
-                    loadingData.innerHTML = '<i class="fa-solid fa-box-open"></i> Yaaah, Admin belum membuat tantangan apapun.';
+                if (bankChallenge.length === 0) {
+                    loadingData.innerHTML = "Belum ada tantangan dari Admin.";
                     return;
                 }
 
-                chalSnapshot.forEach((doc) => {
-                    bankChallenge.push(doc.data());
-                });
-
                 challengeTersedia = [...bankChallenge];
-                
                 loadingData.style.display = 'none';
                 challengeArea.style.display = 'flex';
-
                 tampilkanChallengeBaru();
-
-            } catch (error) {
-                console.error("Gagal mengambil data dari Firebase:", error);
-                loadingData.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Gagal terhubung ke database.';
+            } catch (e) {
+                loadingData.innerHTML = "Gagal memuat data server.";
             }
         }
 
         function tampilkanChallengeBaru() {
             if (challengeTersedia.length === 0) {
-                alert("Wah, kamu sudah mencoba semua tantangan! Kita ulang dari awal ya.");
+                modalOverlay.style.display = 'flex';
                 challengeTersedia = [...bankChallenge];
+                return;
             }
 
-            const indexAcak = Math.floor(Math.random() * challengeTersedia.length);
-            challengeSaatIni = challengeTersedia[indexAcak];
-            challengeTersedia.splice(indexAcak, 1);
+            const idx = Math.floor(Math.random() * challengeTersedia.length);
+            challengeSaatIni = challengeTersedia[idx];
+            challengeTersedia.splice(idx, 1);
 
-            // Render ke Layar
-            imgChallenge.src = challengeSaatIni.img;
-            temaTantangan.textContent = challengeSaatIni.tema;
+            document.getElementById('imgChallenge').src = challengeSaatIni.img;
+            document.getElementById('temaTantangan').textContent = challengeSaatIni.tema;
             
-            areaKataKunci.innerHTML = '';
-            if (challengeSaatIni.kataKunci && Array.isArray(challengeSaatIni.kataKunci)) {
-                challengeSaatIni.kataKunci.forEach(kata => {
-                    const span = document.createElement('span');
-                    span.className = 'keyword-badge';
-                    span.textContent = kata;
-                    areaKataKunci.appendChild(span);
-                });
-            }
+            const areaKata = document.getElementById('areaKataKunci');
+            areaKata.innerHTML = '';
+            challengeSaatIni.kataKunci.forEach(kata => {
+                const span = document.createElement('span');
+                span.className = 'keyword-badge';
+                span.textContent = kata;
+                areaKata.appendChild(span);
+            });
 
-            // Reset Form
             inputAnekdot.value = '';
             formArea.style.display = 'block';
             aiLoading.style.display = 'none';
@@ -480,73 +247,56 @@
             btnNext.style.display = 'none';
         }
 
-        btnKirim.addEventListener('click', async () => {
-            const teksUser = inputAnekdot.value.trim();
-
-            if (teksUser.length < 20) {
-                alert("Teksnya terlalu pendek! Coba ceritakan lebih panjang lagi agar struktur anekdotnya terlihat.");
+        btnKirim.onclick = async () => {
+            const teks = inputAnekdot.value.trim();
+            if (teks.length < 20) {
+                alert("Teks kependekan, Bhe! Minimal 20 karakter biar AI bisa nilai.");
                 return;
             }
 
             formArea.style.display = 'none';
             aiLoading.style.display = 'flex';
 
-            let nilaiAkhir = 0;
-            let komentarAkhir = "";
-
             try {
-                // Menghubungi Vercel API (Google Gemini)
                 const response = await fetch('/api/kc', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        teks: teksUser,
+                        teks: teks,
                         kataKunci: challengeSaatIni.kataKunci
                     })
                 });
 
-                if (!response.ok) throw new Error('API Error');
+                if (!response.ok) throw new Error();
                 
                 const data = await response.json();
-                nilaiAkhir = data.skor;
-                komentarAkhir = data.komentar;
-
-            } catch (error) {
-                console.warn('API Vercel belum aktif atau terjadi error. Menggunakan sistem evaluasi lokal (Fallback).', error);
                 
-                // FALLBACK: Simulasi nilai jika API belum dideploy di Vercel
-                nilaiAkhir = Math.floor(Math.random() * (95 - 75 + 1)) + 75;
-                komentarAkhir = `
-                    <strong>Bagus sekali!</strong> (Catatan: Ini adalah penilaian otomatis offline karena server AI belum terhubung). 
-                    Teksmu sudah mengandung unsur sindiran yang sesuai dengan tema. 
-                    <br><br><em>Saran:</em> Coba buat bagian Krisis/Klimaks lebih mengejutkan lagi!
-                `;
+                aiLoading.style.display = 'none';
+                resultBox.style.display = 'block';
+                btnNext.style.display = 'block';
+
+                document.getElementById('nilaiAI').textContent = data.skor;
+                document.getElementById('feedbackAI').innerHTML = data.komentar;
+
+                skorTotal += parseInt(data.skor);
+                skorElement.textContent = skorTotal;
+                sessionStorage.setItem('skorLocal', skorTotal);
+                if (userDocRef) updateDoc(userDocRef, { skor: skorTotal });
+
+            } catch (e) {
+                aiLoading.style.display = 'none';
+                formArea.style.display = 'block';
+                alert("Gagal menghubungi Guru AI. Pastikan Vercel API sudah aktif!");
             }
+        };
 
-            // Tampilkan Hasil
-            aiLoading.style.display = 'none';
-            resultBox.style.display = 'block';
-            btnNext.style.display = 'block';
+        btnNext.onclick = tampilkanChallengeBaru;
+        document.getElementById('btnTutupModal').onclick = () => {
+            modalOverlay.style.display = 'none';
+            tampilkanChallengeBaru();
+        };
 
-            nilaiAI.textContent = nilaiAkhir;
-            feedbackAI.innerHTML = komentarAkhir;
-
-            // Update Skor
-            skorTotal += nilaiAkhir;
-            skorElement.textContent = skorTotal;
-            sessionStorage.setItem('skorLocal', skorTotal);
-
-            // Simpan ke Firebase secara Real-time
-            if (userDocRef) {
-                try {
-                    await updateDoc(userDocRef, { skor: skorTotal });
-                } catch (err) {
-                    console.error("Gagal update skor ke Firebase:", err);
-                }
-            }
-        });
-
-        btnNext.addEventListener('click', tampilkanChallengeBaru);
+        init();
     </script>
 </body>
 </html>
