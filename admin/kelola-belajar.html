@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Kartu Belajar - Anekdot.io</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 800px; /* Diperlebar agar enak untuk form */
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn-back {
+            color: #94a3b8;
+            font-size: 20px;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: color 0.2s;
+        }
+
+        .btn-back:hover {
+            color: white;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 16px;
+            flex-grow: 1;
+        }
+
+        /* Layout Konten */
+        .content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .content {
+                grid-template-columns: 350px 1fr; /* Membagi dua kolom di layar besar */
+            }
+        }
+
+        /* Form Styling */
+        .card-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .input-group input[type="text"], 
+        .input-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .input-group input:focus, 
+        .input-group textarea:focus {
+            border-color: #3b82f6;
+        }
+
+        .input-group input[type="file"] {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #2563eb;
+        }
+
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Daftar Soal */
+        .soal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .soal-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .soal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .soal-tanya {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .soal-jawab {
+            font-size: 12px;
+            color: #059669;
+            font-weight: 700;
+            background: #d1fae5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .soal-images {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .soal-images img {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-hapus {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-hapus:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Loading Overlay */
+        #loadingStatus {
+            display: none;
+            color: #3b82f6;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Kelola Kartu Belajar</div>
+        </header>
+
+        <div class="content">
+            <div class="card-box" style="height: fit-content;">
+                <div class="card-title">
+                    <i class="fa-solid fa-plus-circle" style="color:#3b82f6;"></i> Tambah Soal Baru
+                </div>
+                
+                <form id="formTambahSoal">
+                    <div class="input-group">
+                        <label>Pertanyaan (Teks Anekdot/Struktur)</label>
+                        <textarea id="inputPertanyaan" rows="3" placeholder="Masukkan pertanyaan di sini..." required></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Jawaban Benar</label>
+                        <input type="text" id="inputJawaban" placeholder="Contoh: ABSTRAKSI" style="text-transform: uppercase;" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Gambar Depan (Soal) - Opsional</label>
+                        <input type="file" id="fileImgDepan" accept="image/*">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Gambar Belakang (Jawaban) - Opsional</label>
+                        <input type="file" id="fileImgBelakang" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSimpan">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Simpan ke Database
+                    </button>
+                    <div id="loadingStatus"><i class="fa-solid fa-spinner fa-spin"></i> Mengunggah gambar & menyimpan data...</div>
+                </form>
+            </div>
+
+            <div class="card-box">
+                <div class="card-title">
+                    <i class="fa-solid fa-database" style="color:#059669;"></i> Daftar Soal Tersimpan
+                </div>
+                
+                <div class="soal-list" id="daftarSoal">
+                    <div style="text-align: center; color: #94a3b8; font-size: 13px; padding: 20px;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Memuat data...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // API Key ImgBB
+        const IMGBB_API_KEY = "2f45fcafb6dfb2dbae295499022ce476";
+
+        // Elemen DOM
+        const form = document.getElementById('formTambahSoal');
+        const btnSimpan = document.getElementById('btnSimpan');
+        const loadingStatus = document.getElementById('loadingStatus');
+        const daftarSoal = document.getElementById('daftarSoal');
+        
+        // Memaksa input jawaban jadi huruf kapital
+        document.getElementById('inputJawaban').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        // 1. Fungsi Mengunggah Gambar ke ImgBB
+        async function uploadKeImgBB(fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) {
+                return null; // Jika tidak ada file, kembalikan null
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    return data.data.url; // Mengembalikan URL langsung dari ImgBB
+                } else {
+                    throw new Error('Gagal mengunggah ke ImgBB');
+                }
+            } catch (error) {
+                console.error("Error ImgBB:", error);
+                return null;
+            }
+        }
+
+        // 2. Logika Menyimpan Soal
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const pertanyaan = document.getElementById('inputPertanyaan').value.trim();
+            const jawaban = document.getElementById('inputJawaban').value.trim();
+            
+            // Ubah UI menjadi status memuat
+            btnSimpan.disabled = true;
+            loadingStatus.style.display = 'block';
+
+            try {
+                // Upload gambar (jika ada) dan tunggu URL-nya
+                let urlDepan = await uploadKeImgBB(document.getElementById('fileImgDepan'));
+                let urlBelakang = await uploadKeImgBB(document.getElementById('fileImgBelakang'));
+
+                // Jika admin tidak upload, berikan gambar default (placeholder)
+                if (!urlDepan) urlDepan = "https://via.placeholder.com/400x200/e3f2fd/2575fc?text=Soal+Anekdot";
+                if (!urlBelakang) urlBelakang = "https://via.placeholder.com/400x200/e8f5e9/4caf50?text=Jawaban";
+
+                // Simpan ke Firestore koleksi "bank_soal_belajar"
+                await addDoc(collection(db, "bank_soal_belajar"), {
+                    pertanyaan: pertanyaan,
+                    jawaban: jawaban,
+                    imgDepan: urlDepan,
+                    imgBelakang: urlBelakang,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("Soal berhasil ditambahkan!");
+                form.reset();
+                muatDaftarSoal(); // Refresh daftar
+
+            } catch (error) {
+                console.error("Error menambah soal:", error);
+                alert("Terjadi kesalahan saat menyimpan data.");
+            } finally {
+                btnSimpan.disabled = false;
+                loadingStatus.style.display = 'none';
+            }
+        });
+
+        // 3. Fungsi Menampilkan Soal dari Firestore
+        async function muatDaftarSoal() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "bank_soal_belajar"));
+                
+                if (querySnapshot.empty) {
+                    daftarSoal.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 13px;">Belum ada soal. Silakan tambahkan.</div>';
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    html += `
+                        <div class="soal-item">
+                            <div class="soal-header">
+                                <div>
+                                    <div class="soal-tanya">${data.pertanyaan}</div>
+                                    <div class="soal-jawab">Kunci: ${data.jawaban}</div>
+                                </div>
+                                <button class="btn-hapus" onclick="hapusSoal('${doc.id}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="soal-images">
+                                <img src="${data.imgDepan}" alt="Depan" title="Gambar Depan">
+                                <img src="${data.imgBelakang}" alt="Belakang" title="Gambar Belakang">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                daftarSoal.innerHTML = html;
+
+            } catch (error) {
+                console.error("Gagal memuat soal:", error);
+                daftarSoal.innerHTML = '<div style="color: #ef4444; font-size: 13px;">Gagal memuat data.</div>';
+            }
+        }
+
+        // 4. Fungsi Menghapus Soal (Dijadikan global agar bisa dipanggil onclick HTML)
+        window.hapusSoal = async function(id) {
+            if (confirm("Yakin ingin menghapus soal ini?")) {
+                try {
+                    await deleteDoc(doc(db, "bank_soal_belajar", id));
+                    muatDaftarSoal(); // Refresh daftar
+                } catch (error) {
+                    console.error("Error menghapus:", error);
+                    alert("Gagal menghapus soal.");
+                }
+            }
+        };
+
+        // Keamanan & Inisialisasi awal
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+            muatDaftarSoal();
+        });
+    </script>
+</body>
+</html>
