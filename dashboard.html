@@ -280,37 +280,75 @@
         </main>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        // Tambahkan fungsi query, where, getDocs, dan deleteDoc
+        import { getFirestore, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Cek apakah user sudah "login"
             const userName = sessionStorage.getItem('userName');
             const userID = sessionStorage.getItem('userID');
 
-            // Jika tidak ada data di sesi, tendang kembali ke index.html
             if (!userName || !userID) {
-                alert("Kamu harus memasukkan nama dulu!");
                 window.location.href = 'index.html';
-                return; // Hentikan eksekusi script selanjutnya
+                return;
             }
 
-            // 2. Tampilkan Nama dan ID ke dalam HTML
             document.getElementById('displayNama').textContent = userName;
             document.getElementById('displayID').textContent = userID;
 
-            // 3. Logika Tombol Logout
+            // LOGIKA TOMBOL LOGOUT TERBARU
             const btnLogout = document.getElementById('btnLogout');
-            btnLogout.addEventListener('click', () => {
-                // Munculkan konfirmasi agar tidak tidak sengaja kepencet
-                const konfirmasi = confirm("Yakin ingin keluar? Sesi permainanmu saat ini akan dihapus dari perangkat ini.");
+            
+            btnLogout.addEventListener('click', async () => {
+                const konfirmasi = confirm("Yakin ingin keluar? Sesi permainan dan skormu saat ini akan dihapus permanen dari papan peringkat.");
                 
                 if (konfirmasi) {
-                    // Hapus data dari session storage
-                    sessionStorage.clear();
-                    // Catatan: Jika ingin menghapus data dari Firebase juga, logikanya bisa ditambahkan di sini.
-                    // Tapi biasanya untuk leaderboard, data skor di Firebase dibiarkan saja.
-                    
-                    // Kembali ke halaman awal
-                    window.location.href = 'index.html';
+                    // Ubah tombol jadi loading agar user tidak klik 2x
+                    btnLogout.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                    btnLogout.disabled = true;
+
+                    try {
+                        // 1. Cari data user ini di Firebase berdasarkan userID
+                        const q = query(collection(db, "users_session"), where("userID", "==", userID));
+                        const querySnapshot = await getDocs(q);
+
+                        // 2. Hapus dokumennya dari database
+                        // Karena userID unik, biasanya hanya ada 1 dokumen yang ditemukan
+                        const deletePromises = [];
+                        querySnapshot.forEach((docSnapshot) => {
+                            deletePromises.push(deleteDoc(docSnapshot.ref));
+                        });
+                        
+                        await Promise.all(deletePromises); // Tunggu sampai proses hapus selesai
+
+                        // 3. Bersihkan memori browser lokal
+                        sessionStorage.clear();
+                        
+                        // 4. Kembali ke halaman login
+                        window.location.href = 'index.html';
+
+                    } catch (error) {
+                        console.error("Gagal menghapus data di Firebase:", error);
+                        alert("Terjadi kesalahan saat menghapus sesi. Pastikan internetmu aktif.");
+                        
+                        // Kembalikan tombol seperti semula jika error
+                        btnLogout.innerHTML = '<i class="fa-solid fa-power-off"></i>';
+                        btnLogout.disabled = false;
+                    }
                 }
             });
         });
