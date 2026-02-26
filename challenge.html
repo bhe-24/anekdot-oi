@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anekdot.io - Kartu Challenge</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #fdf2f8; /* Latar sedikit pink/merah muda khas ikon challenge */
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn-back {
+            color: #555;
+            font-size: 20px;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #d81b60;
+            flex-grow: 1;
+        }
+
+        .poin-badge {
+            background: #ffb300;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Pengantar */
+        .intro-section {
+            padding: 20px;
+            background: linear-gradient(to bottom, #fce4ec, #fff);
+        }
+
+        .intro-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8bbd0;
+            color: #880e4f;
+            border-radius: 12px;
+            border-left: 4px solid #d81b60;
+        }
+
+        .intro-text strong {
+            font-weight: 700;
+        }
+
+        /* Area Kartu Challenge */
+        .challenge-area {
+            padding: 0 20px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .challenge-card {
+            width: 100%;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid #fce4ec;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .card-content {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .challenge-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .keyword-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .keyword-badge {
+            background: #d81b60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Area Penulisan */
+        .textarea-container {
+            width: 100%;
+        }
+
+        .input-anekdot {
+            width: 100%;
+            min-height: 180px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical; /* Biar user bisa tarik textareanya kalau kepanjangan */
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .input-anekdot:focus {
+            border-color: #d81b60;
+            box-shadow: 0 0 8px rgba(216, 27, 96, 0.1);
+        }
+
+        .btn-kirim {
+            width: 100%;
+            padding: 15px;
+            background: #d81b60;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-kirim:hover {
+            background: #ad144d;
+        }
+
+        /* Status & Feedback AI */
+        .ai-status {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 0;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d81b60;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Kotak Hasil Penilaian */
+        .result-box {
+            display: none;
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .result-title {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 14px;
+        }
+
+        .result-score {
+            background: #4caf50;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .result-feedback {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .btn-next {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Kartu Challenge</div>
+            <div class="poin-badge">
+                <i class="fa-solid fa-star"></i> <span id="skorUser">0</span>
+            </div>
+        </header>
+
+        <section class="intro-section">
+            <div class="intro-text">
+                Tantangan untukmu, <strong id="namaUser">Pelajar</strong>! Buatlah sebuah teks anekdot yang singkat, padat, dan menyentil berdasarkan <strong>kata kunci</strong> di bawah ini. AI Guru kita akan menilai karyamu!
+            </div>
+        </section>
+
+        <section class="challenge-area">
+            
+            <div class="challenge-card">
+                <img src="https://via.placeholder.com/400x200/f8bbd0/880e4f?text=Ilustrasi+Tantangan" alt="Tema Challenge" class="card-img" id="imgChallenge">
+                <div class="card-content">
+                    <div class="challenge-title">Gunakan kata kunci berikut:</div>
+                    <div class="keyword-container" id="areaKataKunci">
+                        </div>
+                </div>
+            </div>
+
+            <div class="textarea-container" id="formArea">
+                <textarea id="inputAnekdot" class="input-anekdot" placeholder="Ketik teks anekdot buatanmu di sini..."></textarea>
+                <button class="btn-kirim" id="btnKirim">
+                    <i class="fa-solid fa-robot"></i> Minta AI Menilai
+                </button>
+            </div>
+
+            <div class="ai-status" id="aiLoading">
+                <div class="spinner"></div>
+                <div>AI Guru sedang membaca dan menganalisis karyamu...</div>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-header">
+                    <div class="result-title"><i class="fa-solid fa-check-double"></i> Hasil Evaluasi AI</div>
+                    <div class="result-score">Nilai: <span id="nilaiAI">0</span>/100</div>
+                </div>
+                <div class="result-feedback" id="feedbackAI">
+                    Memuat komentar AI...
+                </div>
+            </div>
+
+            <button class="btn-next" id="btnNext">Lanjut Tantangan Berikutnya <i class="fa-solid fa-arrow-right"></i></button>
+
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Cek Sesi User
+            const userName = sessionStorage.getItem('userName');
+            if (!userName) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('namaUser').textContent = userName;
+
+            // 2. Data Dummy Challenge (Nanti dari Firebase)
+            const bankChallenge = [
+                {
+                    id: 1,
+                    tema: "Lingkungan Sekolah",
+                    kataKunci: ["Kantin", "Mahal", "Tikus"],
+                    img: "https://via.placeholder.com/400x200/ffe0b2/e65100?text=Kantin+Sekolah"
+                },
+                {
+                    id: 2,
+                    tema: "Layanan Publik",
+                    kataKunci: ["Pejabat", "Banjir", "Janji"],
+                    img: "https://via.placeholder.com/400x200/bbdefb/0d47a1?text=Pejabat+dan+Banjir"
+                },
+                {
+                    id: 3,
+                    tema: "Kehidupan Pelajar",
+                    kataKunci: ["PR", "Tidur", "Hukuman"],
+                    img: "https://via.placeholder.com/400x200/c8e6c9/1b5e20?text=Banyak+Tugas"
+                }
+            ];
+
+            let challengeTersedia = [...bankChallenge];
+            let skorTotal = parseInt(sessionStorage.getItem('skorTotal')) || 0; // Ambil skor sementara
+            
+            // Elemen DOM
+            const imgChallenge = document.getElementById('imgChallenge');
+            const areaKataKunci = document.getElementById('areaKataKunci');
+            const inputAnekdot = document.getElementById('inputAnekdot');
+            const btnKirim = document.getElementById('btnKirim');
+            const formArea = document.getElementById('formArea');
+            const aiLoading = document.getElementById('aiLoading');
+            const resultBox = document.getElementById('resultBox');
+            const nilaiAI = document.getElementById('nilaiAI');
+            const feedbackAI = document.getElementById('feedbackAI');
+            const btnNext = document.getElementById('btnNext');
+            const skorElement = document.getElementById('skorUser');
+
+            skorElement.textContent = skorTotal;
+
+            // 3. Render Tantangan Acak
+            function tampilkanChallengeBaru() {
+                if (challengeTersedia.length === 0) {
+                    alert("Wah, kamu sudah mencoba semua tantangan! Kita ulang ya.");
+                    challengeTersedia = [...bankChallenge];
+                }
+
+                const indexAcak = Math.floor(Math.random() * challengeTersedia.length);
+                const challengeSaatIni = challengeTersedia[indexAcak];
+                challengeTersedia.splice(indexAcak, 1);
+
+                // Set Gambar
+                imgChallenge.src = challengeSaatIni.img;
+                
+                // Set Kata Kunci
+                areaKataKunci.innerHTML = ''; // Bersihkan dulu
+                challengeSaatIni.kataKunci.forEach(kata => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword-badge';
+                    span.textContent = kata;
+                    areaKataKunci.appendChild(span);
+                });
+
+                // Reset UI
+                inputAnekdot.value = '';
+                formArea.style.display = 'block';
+                aiLoading.style.display = 'none';
+                resultBox.style.display = 'none';
+                btnNext.style.display = 'none';
+            }
+
+            // 4. Logika Pengiriman ke "AI" (Simulasi)
+            btnKirim.addEventListener('click', () => {
+                const teksUser = inputAnekdot.value.trim();
+
+                if (teksUser.length < 20) {
+                    alert("Teksnya terlalu pendek! Coba ceritakan lebih panjang lagi agar struktur anekdotnya terlihat.");
+                    return;
+                }
+
+                // Sembunyikan form, tampilkan loading AI
+                formArea.style.display = 'none';
+                aiLoading.style.display = 'flex';
+
+                // NANTI DI SINI KITA FETCH KE VERCEL: 
+                // fetch('/api/kc.js', { method: 'POST', body: JSON.stringify({ teks: teksUser }) }) ...
+                
+                // Simulasi proses AI selama 3 detik
+                setTimeout(() => {
+                    aiLoading.style.display = 'none';
+                    resultBox.style.display = 'block';
+                    btnNext.style.display = 'block';
+
+                    // Simulasi hasil dari AI
+                    const nilaiSimulasi = Math.floor(Math.random() * (95 - 75 + 1)) + 75; // Nilai random 75-95
+                    nilaiAI.textContent = nilaiSimulasi;
+                    
+                    feedbackAI.innerHTML = `
+                        <strong>Bagus sekali!</strong> Teksmu sudah memiliki unsur lucu dan sindiran yang cukup pas. 
+                        Penggunaan kata kunci juga sudah disisipkan dengan natural. 
+                        <br><br><em>Saran AI:</em> Coba pertajam lagi bagian Krisis agar punchline-nya lebih nendang!
+                    `;
+
+                    // Update Skor Total (Misal skor challenge ditambahkan ke skor keseluruhan)
+                    skorTotal += nilaiSimulasi;
+                    skorElement.textContent = skorTotal;
+                    sessionStorage.setItem('skorTotal', skorTotal); // Simpan skor sementara
+
+                }, 3000);
+            });
+
+            // 5. Tombol Lanjut
+            btnNext.addEventListener('click', tampilkanChallengeBaru);
+
+            // Inisialisasi awal
+            tampilkanChallengeBaru();
+        });
+    </script>
+</body>
+</html>
