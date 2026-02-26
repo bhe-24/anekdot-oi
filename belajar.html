@@ -17,7 +17,7 @@
         }
 
         body {
-            background: #f0f4f8; /* Latar belakang yang lebih tenang untuk belajar */
+            background: #f0f4f8;
             color: #333;
             min-height: 100vh;
         }
@@ -89,10 +89,6 @@
             border-left: 4px solid #2575fc;
         }
 
-        .intro-text strong {
-            color: #2575fc;
-        }
-
         .action-call {
             text-align: center;
             font-weight: 600;
@@ -100,10 +96,27 @@
             font-size: 14px;
         }
 
-        /* Area Flashcard (Animasi 3D) */
+        /* Loading Data Firebase */
+        .loading-data {
+            text-align: center;
+            padding: 50px 20px;
+            color: #2575fc;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loading-data i {
+            font-size: 30px;
+        }
+
+        /* Area Flashcard (Disembunyikan saat loading) */
         .game-area {
             padding: 0 20px 30px;
-            display: flex;
+            display: none; /* Awalnya hidden */
             flex-direction: column;
             align-items: center;
         }
@@ -111,7 +124,7 @@
         .card-container {
             width: 100%;
             height: 280px;
-            perspective: 1000px; /* Efek 3D */
+            perspective: 1000px;
             margin-bottom: 25px;
         }
 
@@ -123,7 +136,6 @@
             transform-style: preserve-3d;
         }
 
-        /* Class ini ditambahkan via JS saat jawaban benar */
         .card-inner.is-flipped {
             transform: rotateY(180deg);
         }
@@ -141,10 +153,9 @@
             background: #fff;
         }
 
-        /* Bagian Belakang Kartu (Dibalik 180 derajat) */
         .card-back {
             transform: rotateY(180deg);
-            background: #e8f5e9; /* Hijau muda saat benar */
+            background: #e8f5e9;
             justify-content: center;
             align-items: center;
             border: 2px solid #4caf50;
@@ -186,7 +197,6 @@
             text-align: center;
             outline: none;
             transition: border-color 0.3s;
-            /* Memaksa tampilan huruf kapital di CSS */
             text-transform: uppercase; 
         }
 
@@ -221,17 +231,12 @@
             margin-top: 10px;
         }
 
-        .msg-error {
-            color: #f44336;
-        }
+        .msg-error { color: #f44336; }
+        .msg-success { color: #4caf50; }
 
-        .msg-success {
-            color: #4caf50;
-        }
-
-        /* Kontrol Tambahan (Next & Flip Back) */
+        /* Kontrol Tambahan */
         .extra-controls {
-            display: none; /* Disembunyikan awalnya */
+            display: none;
             width: 100%;
             justify-content: space-between;
             margin-top: 20px;
@@ -279,22 +284,26 @@
 
         <section class="intro-section">
             <div class="intro-text">
-                Halo, <strong id="namaUser">Pelajar</strong>! Kamu tahu nggak sih? Teks anekdot itu bukan cuma cerita lucu biasa, tapi cerita lucu yang punya tujuan untuk <strong>menyindir</strong> atau <strong>mengkritik</strong> suatu fenomena.
+                Halo, <strong id="namaUser">Pelajar</strong>! Ayo main tebak struktur atau isi teks anekdot untuk mengumpulkan poinmu.
             </div>
-            <div class="action-call">Ayo main tebak struktur dan kumpulkan poinmu!</div>
+            <div class="action-call">Jawab dengan tepat ya!</div>
         </section>
 
-        <section class="game-area">
-            
+        <div class="loading-data" id="loadingData">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Menyiapkan kartu dari server...
+        </div>
+
+        <section class="game-area" id="gameArea">
             <div class="card-container">
                 <div class="card-inner" id="flashcard">
                     <div class="card-front">
-                        <img src="https://via.placeholder.com/400x200/e3f2fd/2575fc?text=Memuat+Gambar..." alt="Soal Gambar" class="card-img" id="imgDepan">
+                        <img src="" alt="Soal Gambar" class="card-img" id="imgDepan">
                         <div class="card-question" id="teksSoal">Memuat soal...</div>
                     </div>
                     
                     <div class="card-back">
-                        <img src="https://via.placeholder.com/400x200/e8f5e9/4caf50?text=Jawaban+Benar" alt="Jawaban Gambar" class="card-img" id="imgBelakang">
+                        <img src="" alt="Jawaban Gambar" class="card-img" id="imgBelakang">
                         <div class="card-question" style="color: #2e7d32;">
                             Jawaban: <br><strong id="teksJawabanBenar"></strong>
                         </div>
@@ -313,158 +322,188 @@
                 <button class="btn-outline" id="btnBalikKartu">Lihat Soal Lagi</button>
                 <button class="btn-next" id="btnNext">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
             </div>
-
         </section>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Cek Sesi
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variabel Game
+        let bankSoal = [];
+        let soalTersedia = [];
+        let soalSaatIni = null;
+        let skor = parseInt(sessionStorage.getItem('skorLocal')) || 0; 
+        const userID = sessionStorage.getItem('userID');
+        let userDocRef = null; // Untuk menyimpan referensi dokumen user agar update skor lebih cepat
+
+        // Elemen DOM
+        const loadingData = document.getElementById('loadingData');
+        const gameArea = document.getElementById('gameArea');
+        const flashcard = document.getElementById('flashcard');
+        const imgDepan = document.getElementById('imgDepan');
+        const teksSoal = document.getElementById('teksSoal');
+        const imgBelakang = document.getElementById('imgBelakang');
+        const teksJawabanBenar = document.getElementById('teksJawabanBenar');
+        const inputJawab = document.getElementById('inputJawab');
+        const btnKirim = document.getElementById('btnKirim');
+        const pesanFeedback = document.getElementById('pesanFeedback');
+        const areaInput = document.getElementById('areaInput');
+        const areaKontrolLanjut = document.getElementById('areaKontrolLanjut');
+        const btnNext = document.getElementById('btnNext');
+        const btnBalikKartu = document.getElementById('btnBalikKartu');
+        const skorElement = document.getElementById('skorUser');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cek Sesi
             const userName = sessionStorage.getItem('userName');
-            if (!userName) {
+            if (!userName || !userID) {
                 window.location.href = 'index.html';
                 return;
             }
             document.getElementById('namaUser').textContent = userName;
+            skorElement.textContent = skor;
 
-            // 2. Data Dummy Soal (Nanti ini diganti fetch dari Firebase/Admin)
-            const bankSoal = [
-                {
-                    id: 1,
-                    pertanyaan: "Bagian awal yang memberikan gambaran umum tentang isi teks anekdot disebut?",
-                    jawaban: "ABSTRAKSI", // Pastikan huruf kapital
-                    imgDepan: "https://via.placeholder.com/400x200/ffcccb/333?text=Ilustrasi+Awal+Cerita",
-                    imgBelakang: "https://via.placeholder.com/400x200/c8e6c9/333?text=Ini+Adalah+Abstraksi"
-                },
-                {
-                    id: 2,
-                    pertanyaan: "Bagian terjadinya masalah atau hal unik yang menggelitik disebut...",
-                    jawaban: "KRISIS",
-                    imgDepan: "https://via.placeholder.com/400x200/ffe0b2/333?text=Ilustrasi+Konflik",
-                    imgBelakang: "https://via.placeholder.com/400x200/c8e6c9/333?text=Krisis+Sedang+Terjadi"
-                },
-                {
-                    id: 3,
-                    pertanyaan: "Bagian penutup cerita, biasanya berupa simpulan kejadian disebut?",
-                    jawaban: "KODA",
-                    imgDepan: "https://via.placeholder.com/400x200/bbdefb/333?text=Ilustrasi+Akhir+Cerita",
-                    imgBelakang: "https://via.placeholder.com/400x200/c8e6c9/333?text=Selesai+(Koda)"
-                }
-            ];
-
-            // Variabel Status Permainan
-            let soalTersedia = [...bankSoal];
-            let soalSaatIni = null;
-            let skor = 0;
-
-            // Elemen DOM
-            const flashcard = document.getElementById('flashcard');
-            const imgDepan = document.getElementById('imgDepan');
-            const teksSoal = document.getElementById('teksSoal');
-            const imgBelakang = document.getElementById('imgBelakang');
-            const teksJawabanBenar = document.getElementById('teksJawabanBenar');
-            
-            const inputJawab = document.getElementById('inputJawab');
-            const btnKirim = document.getElementById('btnKirim');
-            const pesanFeedback = document.getElementById('pesanFeedback');
-            const areaInput = document.getElementById('areaInput');
-            const areaKontrolLanjut = document.getElementById('areaKontrolLanjut');
-            const btnNext = document.getElementById('btnNext');
-            const btnBalikKartu = document.getElementById('btnBalikKartu');
-            const skorElement = document.getElementById('skorUser');
-
-            // 3. Memaksa input menjadi huruf kapital saat diketik
+            // Paksa input kapital
             inputJawab.addEventListener('input', function() {
                 this.value = this.value.toUpperCase();
             });
 
-            // 4. Fungsi Mengambil Soal Acak
-            function tampilkanSoalBaru() {
-                // Jika soal habis, reset ulang (bisa diubah logikanya nanti)
-                if (soalTersedia.length === 0) {
-                    alert("Wah, kamu sudah menjawab semua soal! Mengulang dari awal ya.");
-                    soalTersedia = [...bankSoal]; 
+            // Mulai Ambil Data Real
+            await siapkanDataGame();
+        });
+
+        async function siapkanDataGame() {
+            try {
+                // 1. Cari Dokumen User di Firebase untuk update skor nanti
+                const qUser = query(collection(db, "users_session"), where("userID", "==", userID));
+                const userSnapshot = await getDocs(qUser);
+                if (!userSnapshot.empty) {
+                    userDocRef = userSnapshot.docs[0].ref;
+                    // Sinkronisasi skor jika Firebase punya skor lebih tinggi dari lokal
+                    const skorFirebase = userSnapshot.docs[0].data().skor || 0;
+                    if (skorFirebase > skor) {
+                        skor = skorFirebase;
+                        sessionStorage.setItem('skorLocal', skor);
+                        skorElement.textContent = skor;
+                    }
                 }
 
-                // Ambil index acak
-                const indexAcak = Math.floor(Math.random() * soalTersedia.length);
-                soalSaatIni = soalTersedia[indexAcak];
+                // 2. Ambil Soal dari Koleksi Admin
+                const soalSnapshot = await getDocs(collection(db, "bank_soal_belajar"));
                 
-                // Hapus soal yang terpilih dari array agar tidak muncul 2x di sesi yang sama
-                soalTersedia.splice(indexAcak, 1);
-
-                // Pasang data ke HTML
-                imgDepan.src = soalSaatIni.imgDepan;
-                teksSoal.textContent = soalSaatIni.pertanyaan;
-                imgBelakang.src = soalSaatIni.imgBelakang;
-                teksJawabanBenar.textContent = soalSaatIni.jawaban;
-
-                // Reset Tampilan UI
-                flashcard.classList.remove('is-flipped'); // Pastikan kartu tertutup
-                inputJawab.value = '';
-                pesanFeedback.innerHTML = '';
-                areaInput.style.display = 'flex';
-                areaKontrolLanjut.style.display = 'none';
-                inputJawab.focus();
-            }
-
-            // 5. Logika Kirim Jawaban
-            btnKirim.addEventListener('click', () => {
-                const jawabanUser = inputJawab.value.trim();
-
-                if (jawabanUser === '') {
-                    pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-triangle-exclamation"></i> Isi jawaban dulu ya!</span>';
+                if (soalSnapshot.empty) {
+                    loadingData.innerHTML = '<i class="fa-solid fa-box-open"></i> Yaaah, Admin belum memasukkan soal apapun ke dalam database.';
                     return;
                 }
 
-                // Cek Jawaban
-                if (jawabanUser === soalSaatIni.jawaban) {
-                    // JAWABAN BENAR
-                    pesanFeedback.innerHTML = '<span class="msg-success"><i class="fa-solid fa-circle-check"></i> Wah, Jawabanmu Benar!</span>';
-                    
-                    // Tambah Skor
-                    skor += 10;
-                    skorElement.textContent = skor;
+                soalSnapshot.forEach((doc) => {
+                    bankSoal.push(doc.data());
+                });
 
-                    // Putar Kartu
-                    flashcard.classList.add('is-flipped');
+                // Gandakan array ke soalTersedia untuk diacak
+                soalTersedia = [...bankSoal];
+                
+                // Matikan loading, tampilkan area game
+                loadingData.style.display = 'none';
+                gameArea.style.display = 'flex';
 
-                    // Sembunyikan input, munculkan tombol next
-                    areaInput.style.display = 'none';
-                    areaKontrolLanjut.style.display = 'flex';
-                    
-                } else {
-                    // JAWABAN SALAH
-                    pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-circle-xmark"></i> Maaf, jawaban kamu belum benar. Coba lagi!</span>';
-                    // Animasi getar sedikit (opsional)
-                    inputJawab.style.transform = "translateX(-5px)";
-                    setTimeout(() => inputJawab.style.transform = "translateX(5px)", 100);
-                    setTimeout(() => inputJawab.style.transform = "translateX(0)", 200);
-                }
-            });
-
-            // Tekan Enter untuk submit
-            inputJawab.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') btnKirim.click();
-            });
-
-            // 6. Tombol Kontrol Tambahan
-            btnNext.addEventListener('click', () => {
                 tampilkanSoalBaru();
-            });
 
-            btnBalikKartu.addEventListener('click', () => {
-                // Toggle balik kartu untuk melihat soal lagi, tanpa me-reset status
-                flashcard.classList.toggle('is-flipped');
-                if(flashcard.classList.contains('is-flipped')){
-                    btnBalikKartu.textContent = "Lihat Soal Lagi";
-                } else {
-                    btnBalikKartu.textContent = "Lihat Jawaban";
+            } catch (error) {
+                console.error("Gagal mengambil data dari Firebase:", error);
+                loadingData.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Gagal terhubung ke database. Periksa koneksi internetmu.';
+            }
+        }
+
+        function tampilkanSoalBaru() {
+            if (soalTersedia.length === 0) {
+                alert("Hebat! Kamu sudah menjawab semua soal di database. Mari kita acak dari awal.");
+                soalTersedia = [...bankSoal]; 
+            }
+
+            // Ambil index acak
+            const indexAcak = Math.floor(Math.random() * soalTersedia.length);
+            soalSaatIni = soalTersedia[indexAcak];
+            soalTersedia.splice(indexAcak, 1);
+
+            // Pasang data asli dari Firebase ke HTML
+            imgDepan.src = soalSaatIni.imgDepan;
+            teksSoal.textContent = soalSaatIni.pertanyaan;
+            imgBelakang.src = soalSaatIni.imgBelakang;
+            teksJawabanBenar.textContent = soalSaatIni.jawaban;
+
+            // Reset UI Kartu
+            flashcard.classList.remove('is-flipped');
+            inputJawab.value = '';
+            pesanFeedback.innerHTML = '';
+            areaInput.style.display = 'flex';
+            areaKontrolLanjut.style.display = 'none';
+            inputJawab.focus();
+        }
+
+        // Logika Pemeriksaan Jawaban
+        btnKirim.addEventListener('click', async () => {
+            const jawabanUser = inputJawab.value.trim().toUpperCase();
+            const jawabanAsli = soalSaatIni.jawaban.trim().toUpperCase();
+
+            if (jawabanUser === '') {
+                pesanFeedback.innerHTML = '<span class="msg-error">Isi jawaban dulu ya!</span>';
+                return;
+            }
+
+            if (jawabanUser === jawabanAsli) {
+                // BENAR
+                pesanFeedback.innerHTML = '<span class="msg-success"><i class="fa-solid fa-circle-check"></i> Wah, Jawabanmu Benar!</span>';
+                
+                skor += 10; // Tambah 10 poin
+                skorElement.textContent = skor;
+                sessionStorage.setItem('skorLocal', skor); // Simpan sementara
+
+                // Update skor Real-time ke Firebase (Agar Leaderboard langsung berubah)
+                if (userDocRef) {
+                    try {
+                        await updateDoc(userDocRef, { skor: skor });
+                    } catch (err) {
+                        console.error("Gagal update skor ke Firebase:", err);
+                    }
                 }
-            });
 
-            // Mulai game saat halaman pertama dibuka
-            tampilkanSoalBaru();
+                flashcard.classList.add('is-flipped');
+                areaInput.style.display = 'none';
+                areaKontrolLanjut.style.display = 'flex';
+                
+            } else {
+                // SALAH
+                pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-circle-xmark"></i> Kurang tepat, coba lagi!</span>';
+                inputJawab.style.transform = "translateX(-5px)";
+                setTimeout(() => inputJawab.style.transform = "translateX(5px)", 100);
+                setTimeout(() => inputJawab.style.transform = "translateX(0)", 200);
+            }
+        });
+
+        inputJawab.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnKirim.click();
+        });
+
+        btnNext.addEventListener('click', tampilkanSoalBaru);
+
+        btnBalikKartu.addEventListener('click', () => {
+            flashcard.classList.toggle('is-flipped');
+            btnBalikKartu.textContent = flashcard.classList.contains('is-flipped') ? "Lihat Soal Lagi" : "Lihat Jawaban";
         });
     </script>
 </body>
