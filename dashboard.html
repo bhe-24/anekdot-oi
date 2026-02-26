@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anekdot.io - Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #333;
+            /* ID untuk menempelkan background dinamis dari admin */
+            id="dynamic-bg"
+        }
+
+        /* Container utama ala aplikasi mobile */
+        .app-container {
+            width: 100%;
+            max-width: 480px; /* Ukuran maksimal layar HP */
+            margin: 0 auto;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        /* Header Styling */
+        header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-mini {
+            width: 35px;
+            height: 35px;
+            background: #2575fc;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .app-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #2575fc;
+        }
+
+        .btn-logout {
+            background: none;
+            border: none;
+            color: #ff4757;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-logout:hover {
+            transform: scale(1.1);
+        }
+
+        /* Konten Utama */
+        .content {
+            padding: 20px;
+        }
+
+        /* Kartu Sapaan */
+        .welcome-card {
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 15px rgba(37, 117, 252, 0.2);
+            text-align: center;
+        }
+
+        .welcome-card h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .user-id {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        /* Menu Section */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #fff;
+            border: 2px solid #edf2f7;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .menu-btn:hover {
+            border-color: #2575fc;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 117, 252, 0.1);
+        }
+
+        .menu-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        /* Warna khusus untuk setiap menu */
+        .icon-belajar { background: #e3f2fd; color: #1e88e5; }
+        .icon-challenge { background: #fce4ec; color: #d81b60; }
+        .icon-materi { background: #e8f5e9; color: #43a047; }
+        .icon-leaderboard { background: #fff8e1; color: #ffb300; }
+
+        .menu-text span {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Footer / Links */
+        .footer-links {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+            margin: 0 10px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #2575fc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="header-left">
+                <div class="logo-mini">A.</div>
+                <div class="app-title">Anekdot.io</div>
+            </div>
+            <button class="btn-logout" id="btnLogout" title="Keluar">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </header>
+
+        <main class="content">
+            <div class="welcome-card">
+                <h2>Halo, <span id="displayNama">Pelajar</span>! 👋</h2>
+                <p>Selamat datang di arena belajar Teks Anekdot.</p>
+                <div class="user-id">ID: <span id="displayID">Memuat...</span></div>
+            </div>
+
+            <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> Arena Belajar</h3>
+            <div class="menu-grid">
+                <a href="belajar.html" class="menu-btn">
+                    <div class="menu-icon icon-belajar">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div class="menu-text">
+                        Kartu Belajar
+                        <span>Tebak struktur & kumpulkan poin</span>
+                    </div>
+                </a>
+
+                <a href="challenge.html" class="menu-btn">
+                    <div class="menu-icon icon-challenge">
+                        <i class="fa-solid fa-pen-nib"></i>
+                    </div>
+                    <div class="menu-text">
+                        Kartu Challenge
+                        <span>Buat teks anekdot & uji dengan AI</span>
+                    </div>
+                </a>
+            </div>
+
+            <h3 class="section-title"><i class="fa-solid fa-book-open"></i> Referensi & Peringkat</h3>
+            <div class="menu-grid">
+                <a href="materi.html" class="menu-btn">
+                    <div class="menu-icon icon-materi">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div class="menu-text">
+                        Materi Anekdot
+                        <span>Pelajari teori lengkapnya di sini</span>
+                    </div>
+                </a>
+
+                <a href="leaderboard.html" class="menu-btn">
+                    <div class="menu-icon icon-leaderboard">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div class="menu-text">
+                        Papan Peringkat
+                        <span>Lihat siapa peraih skor tertinggi!</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="footer-links">
+                <a href="privasi.html">Kebijakan Privasi</a> |
+                <a href="#">Kredit</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Cek apakah user sudah "login"
+            const userName = sessionStorage.getItem('userName');
+            const userID = sessionStorage.getItem('userID');
+
+            // Jika tidak ada data di sesi, tendang kembali ke index.html
+            if (!userName || !userID) {
+                alert("Kamu harus memasukkan nama dulu!");
+                window.location.href = 'index.html';
+                return; // Hentikan eksekusi script selanjutnya
+            }
+
+            // 2. Tampilkan Nama dan ID ke dalam HTML
+            document.getElementById('displayNama').textContent = userName;
+            document.getElementById('displayID').textContent = userID;
+
+            // 3. Logika Tombol Logout
+            const btnLogout = document.getElementById('btnLogout');
+            btnLogout.addEventListener('click', () => {
+                // Munculkan konfirmasi agar tidak tidak sengaja kepencet
+                const konfirmasi = confirm("Yakin ingin keluar? Sesi permainanmu saat ini akan dihapus dari perangkat ini.");
+                
+                if (konfirmasi) {
+                    // Hapus data dari session storage
+                    sessionStorage.clear();
+                    // Catatan: Jika ingin menghapus data dari Firebase juga, logikanya bisa ditambahkan di sini.
+                    // Tapi biasanya untuk leaderboard, data skor di Firebase dibiarkan saja.
+                    
+                    // Kembali ke halaman awal
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
