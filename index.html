@@ -15,7 +15,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Latar belakang default, nanti bisa ditimpa via Admin */
         body {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             background-size: cover;
@@ -25,8 +24,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* ID ini untuk menempelkan gambar background dari database nantinya */
-            id="dynamic-bg"
         }
 
         .login-container {
@@ -194,16 +191,13 @@
             measurementId: "G-8PFY3WW9XL"
         };
 
-        // Inisialisasi Firebase & Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Elemen DOM
         const loginForm = document.getElementById('loginForm');
         const usernameInput = document.getElementById('username');
         const loadingOverlay = document.getElementById('loadingOverlay');
 
-        // Fungsi generate ID Unik (Contoh: AN-A1B2C3)
         function generateUniqueID() {
             const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
             return `AN-${randomStr}`;
@@ -215,27 +209,31 @@
             const name = usernameInput.value.trim();
             if(!name) return;
 
-            // Tampilkan Loading
-            loadingOverlay.classList.add('active');
+            // --- TAMBAHAN LOGIKA SHORTCUT ADMIN ---
+            // .toUpperCase() memastikan bahwa ketikan "klp7", "Klp7", atau "KLP7" semua akan diterima
+            if (name.toUpperCase() === 'KLP7') {
+                window.location.href = 'admin/index.html';
+                return; // Perintah return ini sangat penting agar kode di bawahnya tidak ikut dijalankan
+            }
+            // --------------------------------------
 
+            loadingOverlay.classList.add('active');
             const uniqueID = generateUniqueID();
 
             try {
-                // Simpan data user ke koleksi 'users_session' di Firestore
+                // Simpan data user ke Firestore
                 await addDoc(collection(db, "users_session"), {
                     nama: name,
                     userID: uniqueID,
-                    skor: 0, // Skor awal
+                    skor: 0, 
                     createdAt: serverTimestamp()
                 });
 
-                // Simpan ke Session Storage agar tetap "login" di browser ini
+                // Simpan ke Session Storage
                 sessionStorage.setItem('userName', name);
                 sessionStorage.setItem('userID', uniqueID);
 
-                // Simulasi delay sedikit biar animasi loadingnya kelihatan keren
                 setTimeout(() => {
-                    // Pindah ke halaman dashboard
                     window.location.href = 'dashboard.html';
                 }, 1500);
 
