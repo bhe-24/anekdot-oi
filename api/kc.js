@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Teks anekdot tidak boleh kosong' });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
         // Prompt rahasia untuk AI (Siswa tidak bisa melihat ini)
         const promptSystem = `
