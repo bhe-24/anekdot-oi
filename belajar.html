@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anekdot.io - Kartu Belajar</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f0f4f8; /* Latar belakang yang lebih tenang untuk belajar */
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn-back {
+            color: #555;
+            font-size: 20px;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2575fc;
+            flex-grow: 1;
+        }
+
+        .poin-badge {
+            background: #ffb300;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Konten Pengantar */
+        .intro-section {
+            padding: 20px;
+            background: linear-gradient(to bottom, #f8faff, #fff);
+        }
+
+        .intro-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 12px;
+            border-left: 4px solid #2575fc;
+        }
+
+        .intro-text strong {
+            color: #2575fc;
+        }
+
+        .action-call {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* Area Flashcard (Animasi 3D) */
+        .game-area {
+            padding: 0 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card-container {
+            width: 100%;
+            height: 280px;
+            perspective: 1000px; /* Efek 3D */
+            margin-bottom: 25px;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        /* Class ini ditambahkan via JS saat jawaban benar */
+        .card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        /* Bagian Belakang Kartu (Dibalik 180 derajat) */
+        .card-back {
+            transform: rotateY(180deg);
+            background: #e8f5e9; /* Hijau muda saat benar */
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #4caf50;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .card-question {
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Area Input dan Tombol */
+        .input-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-jawab {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+            /* Memaksa tampilan huruf kapital di CSS */
+            text-transform: uppercase; 
+        }
+
+        .input-jawab:focus {
+            border-color: #2575fc;
+        }
+
+        .btn-kirim {
+            width: 100%;
+            padding: 15px;
+            background: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+            transition: background 0.3s;
+        }
+
+        .btn-kirim:hover {
+            background: #1a5bbf;
+        }
+
+        /* Feedback Pesan (Benar/Salah) */
+        .feedback-msg {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            min-height: 24px;
+            margin-top: 10px;
+        }
+
+        .msg-error {
+            color: #f44336;
+        }
+
+        .msg-success {
+            color: #4caf50;
+        }
+
+        /* Kontrol Tambahan (Next & Flip Back) */
+        .extra-controls {
+            display: none; /* Disembunyikan awalnya */
+            width: 100%;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .btn-outline, .btn-next {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #2575fc;
+            color: #2575fc;
+        }
+
+        .btn-next {
+            background: #4caf50;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Kartu Belajar</div>
+            <div class="poin-badge">
+                <i class="fa-solid fa-star"></i> <span id="skorUser">0</span>
+            </div>
+        </header>
+
+        <section class="intro-section">
+            <div class="intro-text">
+                Halo, <strong id="namaUser">Pelajar</strong>! Kamu tahu nggak sih? Teks anekdot itu bukan cuma cerita lucu biasa, tapi cerita lucu yang punya tujuan untuk <strong>menyindir</strong> atau <strong>mengkritik</strong> suatu fenomena.
+            </div>
+            <div class="action-call">Ayo main tebak struktur dan kumpulkan poinmu!</div>
+        </section>
+
+        <section class="game-area">
+            
+            <div class="card-container">
+                <div class="card-inner" id="flashcard">
+                    <div class="card-front">
+                        <img src="https://via.placeholder.com/400x200/e3f2fd/2575fc?text=Memuat+Gambar..." alt="Soal Gambar" class="card-img" id="imgDepan">
+                        <div class="card-question" id="teksSoal">Memuat soal...</div>
+                    </div>
+                    
+                    <div class="card-back">
+                        <img src="https://via.placeholder.com/400x200/e8f5e9/4caf50?text=Jawaban+Benar" alt="Jawaban Gambar" class="card-img" id="imgBelakang">
+                        <div class="card-question" style="color: #2e7d32;">
+                            Jawaban: <br><strong id="teksJawabanBenar"></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area" id="areaInput">
+                <input type="text" id="inputJawab" class="input-jawab" placeholder="Ketik jawabanmu di sini..." autocomplete="off">
+                <button class="btn-kirim" id="btnKirim">Kirim Jawaban</button>
+            </div>
+
+            <div class="feedback-msg" id="pesanFeedback"></div>
+
+            <div class="extra-controls" id="areaKontrolLanjut">
+                <button class="btn-outline" id="btnBalikKartu">Lihat Soal Lagi</button>
+                <button class="btn-next" id="btnNext">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Cek Sesi
+            const userName = sessionStorage.getItem('userName');
+            if (!userName) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('namaUser').textContent = userName;
+
+            // 2. Data Dummy Soal (Nanti ini diganti fetch dari Firebase/Admin)
+            const bankSoal = [
+                {
+                    id: 1,
+                    pertanyaan: "Bagian awal yang memberikan gambaran umum tentang isi teks anekdot disebut?",
+                    jawaban: "ABSTRAKSI", // Pastikan huruf kapital
+                    imgDepan: "https://via.placeholder.com/400x200/ffcccb/333?text=Ilustrasi+Awal+Cerita",
+                    imgBelakang: "https://via.placeholder.com/400x200/c8e6c9/333?text=Ini+Adalah+Abstraksi"
+                },
+                {
+                    id: 2,
+                    pertanyaan: "Bagian terjadinya masalah atau hal unik yang menggelitik disebut...",
+                    jawaban: "KRISIS",
+                    imgDepan: "https://via.placeholder.com/400x200/ffe0b2/333?text=Ilustrasi+Konflik",
+                    imgBelakang: "https://via.placeholder.com/400x200/c8e6c9/333?text=Krisis+Sedang+Terjadi"
+                },
+                {
+                    id: 3,
+                    pertanyaan: "Bagian penutup cerita, biasanya berupa simpulan kejadian disebut?",
+                    jawaban: "KODA",
+                    imgDepan: "https://via.placeholder.com/400x200/bbdefb/333?text=Ilustrasi+Akhir+Cerita",
+                    imgBelakang: "https://via.placeholder.com/400x200/c8e6c9/333?text=Selesai+(Koda)"
+                }
+            ];
+
+            // Variabel Status Permainan
+            let soalTersedia = [...bankSoal];
+            let soalSaatIni = null;
+            let skor = 0;
+
+            // Elemen DOM
+            const flashcard = document.getElementById('flashcard');
+            const imgDepan = document.getElementById('imgDepan');
+            const teksSoal = document.getElementById('teksSoal');
+            const imgBelakang = document.getElementById('imgBelakang');
+            const teksJawabanBenar = document.getElementById('teksJawabanBenar');
+            
+            const inputJawab = document.getElementById('inputJawab');
+            const btnKirim = document.getElementById('btnKirim');
+            const pesanFeedback = document.getElementById('pesanFeedback');
+            const areaInput = document.getElementById('areaInput');
+            const areaKontrolLanjut = document.getElementById('areaKontrolLanjut');
+            const btnNext = document.getElementById('btnNext');
+            const btnBalikKartu = document.getElementById('btnBalikKartu');
+            const skorElement = document.getElementById('skorUser');
+
+            // 3. Memaksa input menjadi huruf kapital saat diketik
+            inputJawab.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+
+            // 4. Fungsi Mengambil Soal Acak
+            function tampilkanSoalBaru() {
+                // Jika soal habis, reset ulang (bisa diubah logikanya nanti)
+                if (soalTersedia.length === 0) {
+                    alert("Wah, kamu sudah menjawab semua soal! Mengulang dari awal ya.");
+                    soalTersedia = [...bankSoal]; 
+                }
+
+                // Ambil index acak
+                const indexAcak = Math.floor(Math.random() * soalTersedia.length);
+                soalSaatIni = soalTersedia[indexAcak];
+                
+                // Hapus soal yang terpilih dari array agar tidak muncul 2x di sesi yang sama
+                soalTersedia.splice(indexAcak, 1);
+
+                // Pasang data ke HTML
+                imgDepan.src = soalSaatIni.imgDepan;
+                teksSoal.textContent = soalSaatIni.pertanyaan;
+                imgBelakang.src = soalSaatIni.imgBelakang;
+                teksJawabanBenar.textContent = soalSaatIni.jawaban;
+
+                // Reset Tampilan UI
+                flashcard.classList.remove('is-flipped'); // Pastikan kartu tertutup
+                inputJawab.value = '';
+                pesanFeedback.innerHTML = '';
+                areaInput.style.display = 'flex';
+                areaKontrolLanjut.style.display = 'none';
+                inputJawab.focus();
+            }
+
+            // 5. Logika Kirim Jawaban
+            btnKirim.addEventListener('click', () => {
+                const jawabanUser = inputJawab.value.trim();
+
+                if (jawabanUser === '') {
+                    pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-triangle-exclamation"></i> Isi jawaban dulu ya!</span>';
+                    return;
+                }
+
+                // Cek Jawaban
+                if (jawabanUser === soalSaatIni.jawaban) {
+                    // JAWABAN BENAR
+                    pesanFeedback.innerHTML = '<span class="msg-success"><i class="fa-solid fa-circle-check"></i> Wah, Jawabanmu Benar!</span>';
+                    
+                    // Tambah Skor
+                    skor += 10;
+                    skorElement.textContent = skor;
+
+                    // Putar Kartu
+                    flashcard.classList.add('is-flipped');
+
+                    // Sembunyikan input, munculkan tombol next
+                    areaInput.style.display = 'none';
+                    areaKontrolLanjut.style.display = 'flex';
+                    
+                } else {
+                    // JAWABAN SALAH
+                    pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-circle-xmark"></i> Maaf, jawaban kamu belum benar. Coba lagi!</span>';
+                    // Animasi getar sedikit (opsional)
+                    inputJawab.style.transform = "translateX(-5px)";
+                    setTimeout(() => inputJawab.style.transform = "translateX(5px)", 100);
+                    setTimeout(() => inputJawab.style.transform = "translateX(0)", 200);
+                }
+            });
+
+            // Tekan Enter untuk submit
+            inputJawab.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') btnKirim.click();
+            });
+
+            // 6. Tombol Kontrol Tambahan
+            btnNext.addEventListener('click', () => {
+                tampilkanSoalBaru();
+            });
+
+            btnBalikKartu.addEventListener('click', () => {
+                // Toggle balik kartu untuk melihat soal lagi, tanpa me-reset status
+                flashcard.classList.toggle('is-flipped');
+                if(flashcard.classList.contains('is-flipped')){
+                    btnBalikKartu.textContent = "Lihat Soal Lagi";
+                } else {
+                    btnBalikKartu.textContent = "Lihat Jawaban";
+                }
+            });
+
+            // Mulai game saat halaman pertama dibuka
+            tampilkanSoalBaru();
+        });
+    </script>
+</body>
+</html>
