@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Sistem - Anekdot.io</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn-back {
+            color: #94a3b8;
+            font-size: 20px;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: color 0.2s;
+        }
+
+        .btn-back:hover {
+            color: white;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 16px;
+            flex-grow: 1;
+        }
+
+        /* Layout Konten */
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Form Styling */
+        .card-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .input-group input[type="file"] {
+            font-size: 13px;
+            color: #64748b;
+            padding: 10px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            width: 100%;
+            background: #f8fafc;
+        }
+
+        .input-group textarea:focus {
+            border-color: #8b5cf6; /* Warna ungu khas menu pengaturan */
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid #8b5cf6;
+        }
+
+        .btn-submit {
+            padding: 12px 24px;
+            background: #8b5cf6; /* Ungu */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #7c3aed;
+        }
+
+        .btn-submit:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Preview Gambar Latar */
+        .bg-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            background-color: #e2e8f0;
+            background-size: cover;
+            background-position: center;
+            margin-top: 10px;
+            border: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Loading Overlay */
+        .status-msg {
+            display: none;
+            font-size: 13px;
+            margin-left: 15px;
+            font-weight: 600;
+            align-items: center;
+        }
+        
+        .status-loading { color: #8b5cf6; }
+        .status-success { color: #10b981; }
+        .status-error { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Pengaturan Sistem</div>
+        </header>
+
+        <div class="content">
+            
+            <div class="card-box">
+                <div class="card-title">
+                    <i class="fa-solid fa-image" style="color:#3b82f6;"></i> Pengaturan Tampilan Utama
+                </div>
+                
+                <form id="formTampilan">
+                    <div class="input-group">
+                        <label>Latar Belakang (Halaman Login & Dashboard Siswa)</label>
+                        <input type="file" id="fileBackground" accept="image/*">
+                        <div class="hint">Upload gambar baru untuk mengubah tema web. Kosongkan jika tidak ingin mengubah latar saat ini. Rasio terbaik 16:9 atau Portrait HP.</div>
+                        <div class="bg-preview" id="bgPreview">Memuat Latar Saat Ini...</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <button type="submit" class="btn-submit" id="btnSimpanTampilan">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Tampilan
+                        </button>
+                        <span class="status-msg status-loading" id="statusTampilan">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...
+                        </span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-box">
+                <div class="card-title">
+                    <i class="fa-solid fa-robot" style="color:#8b5cf6;"></i> Konfigurasi AI Guru (Gemini)
+                </div>
+                
+                <form id="formAI">
+                    <div class="input-group">
+                        <label>Gaya Penilaian AI (Untuk Kartu Challenge)</label>
+                        <textarea id="inputPromptEvaluasi" rows="4" placeholder="Contoh: Berikan kritik yang pedas tapi membangun..."></textarea>
+                        <div class="hint">Instruksi ini akan dibaca oleh AI sebelum ia menilai teks anekdot siswa. Atur nada bicaranya (misal: "Jadilah guru bahasa Indonesia yang ramah dan memotivasi").</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Gaya Penyusunan Materi AI (Untuk Perpustakaan Mini)</label>
+                        <textarea id="inputPromptMateri" rows="4" placeholder="Contoh: Gunakan bahasa gaul anak SMA..."></textarea>
+                        <div class="hint">Instruksi tambahan saat AI membuat rangkuman teori teks anekdot.</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <button type="submit" class="btn-submit" id="btnSimpanAI">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Konfigurasi AI
+                        </button>
+                        <span class="status-msg status-loading" id="statusAI">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...
+                        </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // API Key ImgBB
+        const IMGBB_API_KEY = "2f45fcafb6dfb2dbae295499022ce476";
+
+        // Referensi Dokumen Pengaturan Global di Firestore
+        const settingsRef = doc(db, "pengaturan", "global");
+
+        // Elemen UI Tampilan
+        const formTampilan = document.getElementById('formTampilan');
+        const fileBackground = document.getElementById('fileBackground');
+        const bgPreview = document.getElementById('bgPreview');
+        const btnSimpanTampilan = document.getElementById('btnSimpanTampilan');
+        const statusTampilan = document.getElementById('statusTampilan');
+
+        // Elemen UI AI
+        const formAI = document.getElementById('formAI');
+        const inputPromptEvaluasi = document.getElementById('inputPromptEvaluasi');
+        const inputPromptMateri = document.getElementById('inputPromptMateri');
+        const btnSimpanAI = document.getElementById('btnSimpanAI');
+        const statusAI = document.getElementById('statusAI');
+
+        // 1. Fungsi Mengambil Pengaturan Saat Ini
+        async function muatPengaturan() {
+            try {
+                const docSnap = await getDoc(settingsRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Set Data Tampilan
+                    if (data.backgroundUrl) {
+                        bgPreview.style.backgroundImage = `url('${data.backgroundUrl}')`;
+                        bgPreview.textContent = '';
+                    } else {
+                        bgPreview.textContent = 'Belum Ada Latar Khusus';
+                    }
+
+                    // Set Data Prompt AI
+                    if (data.promptEvaluasi) inputPromptEvaluasi.value = data.promptEvaluasi;
+                    if (data.promptMateri) inputPromptMateri.value = data.promptMateri;
+                } else {
+                    bgPreview.textContent = 'Data Pengaturan Belum Dibuat';
+                }
+            } catch (error) {
+                console.error("Gagal memuat pengaturan:", error);
+                bgPreview.textContent = 'Gagal Memuat Data';
+            }
+        }
+
+        // 2. Fungsi Mengunggah Gambar ke ImgBB
+        async function uploadKeImgBB(fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return null;
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) return data.data.url;
+                throw new Error('Gagal mengunggah');
+            } catch (error) {
+                console.error("Error ImgBB:", error);
+                return null;
+            }
+        }
+
+        // 3. Logika Simpan Tampilan
+        formTampilan.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btnSimpanTampilan.disabled = true;
+            statusTampilan.style.display = 'inline-flex';
+            statusTampilan.className = 'status-msg status-loading';
+            statusTampilan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah & Menyimpan...';
+
+            try {
+                const imgUrl = await uploadKeImgBB(fileBackground);
+                if (imgUrl) {
+                    // Gunakan merge: true agar tidak menimpa pengaturan AI yang sudah ada
+                    await setDoc(settingsRef, { backgroundUrl: imgUrl }, { merge: true });
+                    bgPreview.style.backgroundImage = `url('${imgUrl}')`;
+                    bgPreview.textContent = '';
+                    fileBackground.value = ''; // Reset input file
+                    
+                    statusTampilan.className = 'status-msg status-success';
+                    statusTampilan.innerHTML = '<i class="fa-solid fa-check"></i> Berhasil disimpan!';
+                } else {
+                    statusTampilan.style.display = 'none';
+                    alert("Tidak ada gambar yang dipilih atau gagal mengunggah.");
+                }
+            } catch (error) {
+                console.error(error);
+                statusTampilan.className = 'status-msg status-error';
+                statusTampilan.innerHTML = '<i class="fa-solid fa-xmark"></i> Gagal menyimpan.';
+            } finally {
+                btnSimpanTampilan.disabled = false;
+                setTimeout(() => statusTampilan.style.display = 'none', 3000);
+            }
+        });
+
+        // 4. Logika Simpan AI
+        formAI.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btnSimpanAI.disabled = true;
+            statusAI.style.display = 'inline-flex';
+            statusAI.className = 'status-msg status-loading';
+            statusAI.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const promptEval = inputPromptEvaluasi.value.trim();
+                const promptMat = inputPromptMateri.value.trim();
+
+                await setDoc(settingsRef, {
+                    promptEvaluasi: promptEval,
+                    promptMateri: promptMat
+                }, { merge: true });
+
+                statusAI.className = 'status-msg status-success';
+                statusAI.innerHTML = '<i class="fa-solid fa-check"></i> Konfigurasi AI diperbarui!';
+            } catch (error) {
+                console.error(error);
+                statusAI.className = 'status-msg status-error';
+                statusAI.innerHTML = '<i class="fa-solid fa-xmark"></i> Gagal menyimpan.';
+            } finally {
+                btnSimpanAI.disabled = false;
+                setTimeout(() => statusAI.style.display = 'none', 3000);
+            }
+        });
+
+        // Keamanan & Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+            muatPengaturan();
+        });
+    </script>
+</body>
+</html>
