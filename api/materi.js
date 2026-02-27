@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
         // Inisialisasi Gemini dengan API Key
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         // Menggunakan model flash yang super cepat
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemma-3-24b" });
 
         // Prompt khusus untuk menyusun materi
         const promptSystem = `
