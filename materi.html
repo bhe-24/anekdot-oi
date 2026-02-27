@@ -234,7 +234,7 @@
 
             try {
                 // MENGHUBUNGI VERCEL API SECARA PAKSA (Tidak ada fallback offline)
-                const response = await fetch('/api/materi.js', {
+                const response = await fetch('/api/materi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
