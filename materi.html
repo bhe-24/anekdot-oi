@@ -3,170 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anekdot.io - Materi Belajar</title>
+    <title>Anekdot.io - Perpustakaan Materi</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* Latar Belakang Pastel Animasi Tipis */
+        body { 
+            background: linear-gradient(-45deg, #dcfce7, #e0f2fe, #fce7f3, #fef3c7);
+            background-size: 400% 400%;
+            animation: pastelGradient 15s ease infinite;
+            color: #333; 
+            min-height: 100vh; 
         }
 
-        body {
-            background: #f4f8f5; /* Latar hijau super muda, nyaman untuk membaca */
-            color: #333;
-            min-height: 100vh;
+        @keyframes pastelGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
+        /* Container ala Glassmorphism */
         .app-container {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+            position: relative; display: flex; flex-direction: column; overflow-x: hidden;
         }
 
-        /* Header */
+        /* HEADER */
         header {
-            background: #fff;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.6); padding: 15px 20px; display: flex; align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4); position: sticky; top: 0; z-index: 20;
         }
+        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; transition: 0.3s;}
+        .btn-back:hover { color: #10b981; transform: translateX(-3px); }
+        .header-title { font-weight: 700; font-size: 16px; color: #059669; flex-grow: 1; }
 
-        .btn-back {
-            color: #555;
-            font-size: 20px;
-            text-decoration: none;
-            margin-right: 15px;
-        }
-
-        .header-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #43a047; /* Warna hijau khas menu materi */
-            flex-grow: 1;
-        }
-
-        /* Pengantar Topik */
+        /* HERO BANNER MATERI */
         .topic-header {
-            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.2);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; padding: 30px 20px; text-align: center;
+            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); position: relative; overflow: hidden;
         }
-
-        .topic-header h1 {
-            font-size: 20px;
-            margin-bottom: 5px;
+        .topic-header::before {
+            content: "\f518"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; font-size: 100px; color: rgba(255,255,255,0.1);
+            top: -10px; right: -10px; transform: rotate(15deg);
         }
+        .topic-header h1 { font-size: 22px; margin-bottom: 5px; font-weight: 800; position: relative; z-index: 2;}
+        .topic-header p { font-size: 13px; opacity: 0.9; font-weight: 500; position: relative; z-index: 2;}
 
-        .topic-header p {
-            font-size: 13px;
-            opacity: 0.9;
+        /* TOMBOL AUDIO (DENGARKAN) */
+        .audio-bar {
+            padding: 0 20px; margin-top: -20px; position: relative; z-index: 5;
+            display: none; /* Disembunyikan saat loading */
         }
-
-        /* Area Konten Materi */
-        .content-area {
-            padding: 20px;
-            flex-grow: 1;
+        .btn-audio {
+            width: 100%; background: #fff; border: 2px solid #fff;
+            padding: 15px; border-radius: 15px; font-size: 14px; font-weight: 700;
+            color: #059669; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15); cursor: pointer; transition: all 0.3s;
         }
+        .btn-audio:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(16, 185, 129, 0.2); }
+        .btn-audio.playing { background: #fee2e2; color: #ef4444; border-color: #fecaca; }
+        .btn-audio.playing i { animation: pulse 1s infinite; }
 
-        /* Styling Dinamis untuk Konten dari AI */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        /* AREA KONTEN */
+        .content-area { padding: 20px; flex-grow: 1; }
+
+        /* KOTAK MATERI PREMIUM */
         .materi-box {
-            background: #fff;
-            line-height: 1.7;
-            font-size: 14px;
-            color: #444;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px; padding: 25px 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            line-height: 1.8; font-size: 14px; color: #334155;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
+        /* Desain Tipografi Teks AI */
         .materi-box h3 {
-            color: #2e7d32;
-            font-size: 18px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #e8f5e9;
-            padding-bottom: 5px;
+            color: #059669; font-size: 18px; font-weight: 800;
+            margin-top: 25px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
         }
-
-        .materi-box h4 {
-            color: #333;
-            margin-top: 15px;
-            margin-bottom: 8px;
+        .materi-box h3::before {
+            content: ""; display: inline-block; width: 6px; height: 20px;
+            background: #10b981; border-radius: 5px;
         }
-
-        .materi-box p {
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-
-        .materi-box ul, .materi-box ol {
-            margin-bottom: 15px;
-            padding-left: 20px;
-        }
-
+        .materi-box h3:first-child { margin-top: 0; }
+        .materi-box p { margin-bottom: 15px; text-align: justify; }
+        .materi-box ul, .materi-box ol { margin-bottom: 15px; padding-left: 10px; list-style: none;}
         .materi-box li {
-            margin-bottom: 8px;
+            margin-bottom: 10px; position: relative; padding-left: 20px;
         }
-
-        .materi-box strong {
-            color: #1b5e20;
+        .materi-box li::before {
+            content: "\f058"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; left: 0; top: 2px; color: #10b981; font-size: 12px;
         }
+        .materi-box strong { color: #047857; font-weight: 700; background: #ecfdf5; padding: 2px 6px; border-radius: 6px;}
 
-        /* Status Loading AI */
+        /* STATUS LOADING MODERN */
         .loading-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            text-align: center;
-            color: #666;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 60px 20px; text-align: center;
+            color: #059669; font-weight: 600;
         }
-
+        .spinner-wrapper { position: relative; margin-bottom: 20px; width: 60px; height: 60px;}
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e8f5e9;
-            border-top: 4px solid #43a047;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            width: 100%; height: 100%; border: 4px solid #dcfce7;
+            border-top: 4px solid #10b981; border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+        }
+        .spinner-icon {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 20px; color: #10b981;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Tombol Error/Reload */
-        .btn-reload {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #43a047;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: none;
+        /* FOOTER PATEN */
+        .footer-area {
+            background: rgba(255, 255, 255, 0.5); text-align: center; padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.4); margin-top: auto;
         }
-        
+        .footer-links a { color: #64748b; text-decoration: none; font-size: 12px; font-weight: 600; margin: 0 10px; transition: 0.2s; }
+        .footer-links a:hover { color: #10b981; }
+        .copyright { font-size: 11px; color: #94a3b8; margin-top: 5px;}
     </style>
 </head>
 <body>
@@ -174,31 +144,44 @@
     <div class="app-container">
         <header>
             <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
-            <div class="header-title">Perpustakaan Mini</div>
+            <div class="header-title">Perpustakaan Materi</div>
         </header>
 
         <div class="topic-header">
-            <h1>Membedah Teks Anekdot</h1>
-            <p>Halo <span id="namaUser">Pelajar</span>! Yuk, pahami teorinya sebelum mulai bermain.</p>
+            <h1>Bedah Teks Anekdot</h1>
+            <p>Halo, <span id="namaUser">Pelajar</span>! Mari pahami konsepnya dengan santai.</p>
+        </div>
+
+        <div class="audio-bar" id="audioBar">
+            <button class="btn-audio" id="btnPlayAudio">
+                <i class="fa-solid fa-circle-play" style="font-size: 22px;"></i>
+                <span>Dengarkan Materi</span>
+            </button>
         </div>
 
         <div class="content-area">
-            
             <div class="loading-state" id="loadingState">
-                <div class="spinner"></div>
-                <div>AI Guru sedang menyusun materi terbaik untukmu...</div>
-                <button class="btn-reload" id="btnReload" onclick="fetchMateriAPI()">Coba Lagi</button>
+                <div class="spinner-wrapper">
+                    <div class="spinner"></div>
+                    <i class="fa-solid fa-book-open-reader spinner-icon"></i>
+                </div>
+                <div id="loadingText">Guru sedang menyiapkan catatan terbaik untukmu...</div>
             </div>
 
-            <div class="materi-box" id="materiContent" style="display: none;">
-                </div>
+            <div class="materi-box" id="materiContent" style="display: none;"></div>
+        </div>
 
+        <div class="footer-area">
+            <div class="footer-links">
+                <a href="privasi.html">Kebijakan Privasi</a> •
+                <a href="privasi.html">Kredit</a>
+            </div>
+            <div class="copyright">© 2026 Anekdot.io by Cendekia Aksara</div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Cek Sesi
             const userName = sessionStorage.getItem('userName');
             if (!userName) {
                 window.location.href = 'index.html';
@@ -206,89 +189,127 @@
             }
             document.getElementById('namaUser').textContent = userName;
 
-            // 2. Jalankan fungsi ambil materi
             fetchMateriAPI();
         });
 
-        // Fungsi untuk mengambil materi dari Vercel API
         async function fetchMateriAPI() {
             const loadingState = document.getElementById('loadingState');
             const materiContent = document.getElementById('materiContent');
-            const btnReload = document.getElementById('btnReload');
-            const textLoading = loadingState.querySelector('div:not(.spinner)');
-
-            // Reset UI
-            loadingState.style.display = 'flex';
-            materiContent.style.display = 'none';
-            btnReload.style.display = 'none';
-            textLoading.textContent = 'AI Guru sedang menyusun materi terbaik untukmu...';
+            const audioBar = document.getElementById('audioBar');
+            
+            // Konfigurasi Prompt
+            const payload = {
+                topikMateri: "Pengertian, Tujuan, Struktur (Abstraksi, Orientasi, Krisis, Reaksi, Koda), dan Kaidah Kebahasaan Teks Anekdot.",
+                instruksiKhusus: "Gunakan bahasa yang santai, mudah dipahami anak SMA kelas 10, dan berikan satu contoh analogi sederhana. Gunakan tag HTML h3, p, ul, li."
+            };
 
             try {
-                // Konfigurasi Prompt yang dikirim ke API
-                const payload = {
-                    topikMateri: "Pengertian, Tujuan, Struktur (Abstraksi, Orientasi, Krisis, Reaksi, Koda), dan Kaidah Kebahasaan Teks Anekdot.",
-                    instruksiKhusus: "Gunakan bahasa yang santai, mudah dipahami anak SMA kelas 10, dan berikan satu contoh analogi sederhana."
-                };
-
-                // Panggil API Vercel (Pastikan URL /api/materi.js sudah ada di server)
-                // Catatan: Jika dijalankan secara lokal tanpa server Vercel, ini akan error. 
-                // Kita gunakan try-catch untuk menangani fallback-nya.
+                // MENGHUBUNGI VERCEL API
                 const response = await fetch('/api/materi', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    throw new Error('Gagal terhubung ke API AI');
-                }
+                if (!response.ok) throw new Error('API Error');
 
                 const data = await response.json();
-
-                // Masukkan HTML dari AI ke dalam halaman
-                materiContent.innerHTML = data.kontenHtml;
-                
-                // Tampilkan Konten
-                loadingState.style.display = 'none';
-                materiContent.style.display = 'block';
+                tampilkanData(data.kontenHtml);
 
             } catch (error) {
-                console.warn('API belum siap atau error jaringan. Menampilkan materi offline (Fallback).', error);
+                console.warn('API belum terhubung ke Vercel. Memuat materi premium offline...');
                 
-                // TAMPILAN JAGA-JAGA (FALLBACK)
-                // Jika web dijalankan luring/lokal, tampilkan data statis ini agar UI tetap terlihat rapi.
+                // FALLBACK MATERI (Tetap ditampilkan jika API Vercel belum berjalan)
                 setTimeout(() => {
                     const fallbackHTML = `
-                        <h3>1. Apa itu Teks Anekdot?</h3>
-                        <p>Teks anekdot adalah cerita singkat yang menarik karena lucu dan mengesankan, biasanya mengenai orang penting atau terkenal dan berdasarkan kejadian yang sebenarnya. Tapi ingat, tujuan utamanya bukan cuma bikin ketawa, melainkan <strong>menyampaikan kritik atau sindiran</strong> secara halus.</p>
+                        <h3>Apa itu Teks Anekdot?</h3>
+                        <p>Bayangkan kamu lagi ngopi terus ada temanmu cerita pengalaman apesnya yang super lucu, tapi ujung-ujungnya dia nyindir keadaan sosial. Nah, itulah Anekdot! Teks anekdot adalah cerita singkat yang mengesankan dan lucu, biasanya soal orang penting, yang fungsinya untuk <strong>mengkritik secara halus</strong>.</p>
                         
-                        <h3>2. Struktur Teks Anekdot</h3>
-                        <p>Biar ceritanya runtut, anekdot punya kerangka seperti ini:</p>
+                        <h3>Struktur Pembangun</h3>
+                        <p>Cerita anekdot yang bagus itu ada alurnya, nggak asal nyerocos. Ini dia 5 strukturnya:</p>
                         <ul>
-                            <li><strong>Abstraksi:</strong> Pendahuluan yang menyatakan latar belakang atau gambaran umum.</li>
-                            <li><strong>Orientasi:</strong> Bagian cerita yang mengarah pada terjadinya suatu krisis, konflik, atau peristiwa utama.</li>
-                            <li><strong>Krisis:</strong> Bagian inti terjadinya hal unik atau masalah yang menggelitik.</li>
-                            <li><strong>Reaksi:</strong> Tanggapan atau respons atas krisis yang dinyatakan sebelumnya.</li>
-                            <li><strong>Koda:</strong> Kesimpulan atau penutup cerita.</li>
+                            <li><strong>Abstraksi:</strong> Pemanasan. Ngasih gambaran awal cerita ini tentang apa.</li>
+                            <li><strong>Orientasi:</strong> Mulai masuk ke latar belakang. Kenapa masalah ini bisa terjadi?</li>
+                            <li><strong>Krisis:</strong> Ini gong-nya! Bagian paling unik, aneh, atau lucu dari cerita.</li>
+                            <li><strong>Reaksi:</strong> Cara tokoh dalam cerita ngerespons si "krisis" tadi. Biasanya di sinilah letak tawanya.</li>
+                            <li><strong>Koda:</strong> Penutup. Pesan moral atau kondisi akhir ceritanya.</li>
                         </ul>
 
-                        <h3>3. Kaidah Kebahasaan</h3>
+                        <h3>Ciri Kebahasaan</h3>
+                        <p>Kalau kamu baca teks, kamu bisa tahu itu anekdot dari ciri-cirinya:</p>
                         <ul>
-                            <li>Menggunakan kalimat masa lalu (Contoh: <em>Pada suatu hari...</em>)</li>
-                            <li>Menggunakan kalimat retoris (pertanyaan yang tidak butuh jawaban).</li>
-                            <li>Menggunakan konjungsi waktu (kemudian, lalu, setelah itu).</li>
-                            <li>Banyak menggunakan kata kerja aksi.</li>
+                            <li>Pakai keterangan waktu masa lalu (contoh: <em>Zaman dahulu...</em>).</li>
+                            <li>Pakai pertanyaan retoris (pertanyaan yang nggak butuh dijawab).</li>
+                            <li>Pakai kata kerja aksi (contoh: <em>berjalan, memukul</em>).</li>
+                            <li>Alurnya urut pakai konjungsi waktu (<em>kemudian, lalu</em>).</li>
                         </ul>
                     `;
+                    tampilkanData(fallbackHTML);
+                }, 2000); // Simulasi waktu guru menyiapkan materi
+            }
 
-                    materiContent.innerHTML = fallbackHTML;
-                    loadingState.style.display = 'none';
-                    materiContent.style.display = 'block';
-                }, 1500); // Simulasi loading 1,5 detik
+            function tampilkanData(htmlString) {
+                loadingState.style.display = 'none';
+                materiContent.innerHTML = htmlString;
+                materiContent.style.display = 'block';
+                audioBar.style.display = 'block'; // Tampilkan tombol audio
             }
         }
+
+        // ==========================================
+        // LOGIKA TEXT-TO-SPEECH (AUDIO GURU)
+        // ==========================================
+        const btnPlayAudio = document.getElementById('btnPlayAudio');
+        const iconAudio = btnPlayAudio.querySelector('i');
+        const textAudio = btnPlayAudio.querySelector('span');
+        let synth = window.speechSynthesis;
+        let isPlaying = false;
+
+        btnPlayAudio.addEventListener('click', () => {
+            if (isPlaying) {
+                // Jika sedang bermain, matikan
+                synth.cancel();
+                isPlaying = false;
+                resetTombolAudio();
+            } else {
+                // Ambil teks murni (tanpa tag HTML) dari kotak materi
+                const rawText = document.getElementById('materiContent').innerText;
+                
+                // Pastikan tidak ada suara yang numpuk
+                synth.cancel(); 
+
+                const utterance = new SpeechSynthesisUtterance(rawText);
+                utterance.lang = 'id-ID'; // Bahasa Indonesia
+                utterance.rate = 0.9;     // Kecepatan membaca agak lambat biar jelas
+                utterance.pitch = 1;      // Nada normal
+
+                // Ubah UI Tombol
+                btnPlayAudio.classList.add('playing');
+                iconAudio.className = 'fa-solid fa-circle-stop';
+                textAudio.textContent = 'Hentikan Suara';
+                isPlaying = true;
+
+                synth.speak(utterance);
+
+                // Kembalikan tombol ke semula jika sudah selesai dibaca
+                utterance.onend = () => {
+                    isPlaying = false;
+                    resetTombolAudio();
+                };
+            }
+        });
+
+        function resetTombolAudio() {
+            btnPlayAudio.classList.remove('playing');
+            iconAudio.className = 'fa-solid fa-circle-play';
+            textAudio.textContent = 'Dengarkan Materi';
+        }
+
+        // Matikan suara kalau pengguna pindah halaman (tekan tombol back)
+        window.addEventListener('beforeunload', () => {
+            if (synth) synth.cancel();
+        });
+
     </script>
 </body>
 </html>
