@@ -47,7 +47,7 @@ Arahan tambahan: "${instruksiKhusus || 'Buat dengan gaya bahasa santai'}".`;
             },
             body: JSON.stringify({
                 // Opsional: Jika gemma-3 free sering error, kamu bisa ganti ke "google/gemini-2.5-flash:free"
-                "model": "google/gemma-3-27b-it:free", 
+                "model": "openrouter/free", 
                 "messages": [
                     { "role": "system", "content": promptSystem },
                     { "role": "user", "content": promptUser }
