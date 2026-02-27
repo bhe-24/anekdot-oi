@@ -13,18 +13,35 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        body { background: #f4f7f9; color: #333; min-height: 100vh; }
+        /* Latar Belakang Pastel Animasi Tipis */
+        body { 
+            /* Gradasi 4 warna pastel yang lembut */
+            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: pastelGradient 15s ease infinite;
+            color: #333; 
+            min-height: 100vh; 
+        }
 
+        @keyframes pastelGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Container ala Glassmorphism (Kaca Buram) */
         .app-container {
             width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
-            background: #fff; box-shadow: 0 0 25px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.75); /* Semi Transparan */
+            backdrop-filter: blur(15px); /* Efek Kaca Buram */
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
             position: relative; display: flex; flex-direction: column; overflow-x: hidden;
         }
 
         /* HEADER */
         header {
-            background: #fff; padding: 15px 20px; display: flex; align-items: center;
-            border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;
+            background: rgba(255, 255, 255, 0.6); padding: 15px 20px; display: flex; align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); position: sticky; top: 0; z-index: 10;
         }
         .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; transition: 0.3s;}
         .btn-back:hover { color: #2575fc; transform: translateX(-3px); }
@@ -36,21 +53,20 @@
         }
 
         /* MATERI BERJALAN (TYPEWRITER) */
-        .intro-section { padding: 15px 20px; background: #fff; }
+        .intro-section { padding: 15px 20px; }
         .intro-box {
-            background: #f8fbff; border: 1px solid #e3f2fd; border-radius: 15px;
-            padding: 15px; position: relative; min-height: 90px;
-            display: flex; align-items: center;
+            background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.5); 
+            border-radius: 15px; padding: 15px; position: relative; min-height: 90px;
+            display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
         .intro-box::before {
             content: "\f0eb"; font-family: "Font Awesome 6 Free"; font-weight: 900;
             position: absolute; top: -10px; left: 15px; background: #2575fc; color: #fff;
             width: 24px; height: 24px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; font-size: 12px;
+            box-shadow: 0 2px 5px rgba(37, 117, 252, 0.3);
         }
-        .intro-text {
-            font-size: 13px; color: #444; line-height: 1.6; font-weight: 500;
-        }
+        .intro-text { font-size: 13px; color: #444; line-height: 1.6; font-weight: 500; }
         .cursor { display: inline-block; width: 3px; background-color: #2575fc; animation: blink 1s infinite; margin-left: 2px;}
         @keyframes blink { 50% { opacity: 0; } }
 
@@ -62,9 +78,7 @@
             overflow: hidden; position: relative; white-space: nowrap; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .humor-text {
-            display: inline-block; animation: marquee 10s linear infinite;
-        }
+        .humor-text { display: inline-block; animation: marquee 10s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(100vw); } 100% { transform: translateX(-150%); } }
 
         /* AREA GAME */
@@ -77,11 +91,11 @@
         }
         .card-inner {
             width: 100%; height: 100%; position: relative;
-            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animasi membal elegan */
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             transform-style: preserve-3d;
         }
         .card-container:hover .card-inner:not(.is-flipped) {
-            transform: scale(1.02) translateY(-5px); /* Sedikit naik saat disentuh */
+            transform: scale(1.02) translateY(-5px); 
         }
         .card-inner.is-flipped { transform: rotateY(180deg) scale(1); }
 
@@ -92,14 +106,12 @@
             background: #fff; border: 3px solid #fff;
         }
         .card-back { transform: rotateY(180deg); border-color: #4caf50; }
-
-        /* Gambar full 100% */
         .card-img { width: 100%; height: 100%; object-fit: cover; }
 
         /* KOTAK PERTANYAAN DI BAWAH KARTU */
         .question-box {
-            background: #fff; border: 2px solid #edf2f7; border-radius: 15px;
-            padding: 15px; text-align: center; font-size: 14px; font-weight: 600;
+            background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(255,255,255,0.6); 
+            border-radius: 15px; padding: 15px; text-align: center; font-size: 14px; font-weight: 600;
             color: #333; margin-bottom: 20px; width: 100%;
             box-shadow: 0 5px 15px rgba(0,0,0,0.03); line-height: 1.5;
         }
@@ -107,11 +119,12 @@
         /* INPUT & TOMBOL MODERN */
         .input-area { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .input-jawab {
-            width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 15px;
+            width: 100%; padding: 16px; border: 2px solid rgba(226, 232, 240, 0.8); border-radius: 15px;
             font-size: 16px; text-align: center; outline: none; text-transform: uppercase; 
-            transition: all 0.3s ease; font-weight: 600; color: #1e293b; background: #f8fafc;
+            transition: all 0.3s ease; font-weight: 600; color: #1e293b; background: rgba(248, 250, 252, 0.8);
         }
         .input-jawab:focus { border-color: #2575fc; background: #fff; box-shadow: 0 0 0 4px rgba(37, 117, 252, 0.1); }
+        
         .btn-kirim {
             width: 100%; padding: 16px; background: linear-gradient(135deg, #2575fc, #3b82f6);
             color: white; border: none; border-radius: 15px; font-size: 16px; font-weight: 700;
@@ -120,21 +133,20 @@
         .btn-kirim:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 117, 252, 0.4); }
 
         .feedback-msg { text-align: center; font-size: 14px; font-weight: 700; margin-top: 10px; min-height: 20px;}
-        .msg-error { color: #ef4444; animation: shake 0.4s; display: inline-block;}
+        .msg-error { color: #ef4444; }
         .msg-success { color: #10b981; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
 
         .extra-controls { display: none; width: 100%; gap: 12px; margin-top: 15px; }
         .btn-outline, .btn-next { flex: 1; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s;}
-        .btn-outline { background: #fff; border: 2px solid #cbd5e1; color: #64748b; }
+        .btn-outline { background: rgba(255,255,255,0.8); border: 2px solid #cbd5e1; color: #64748b; }
         .btn-outline:hover { border-color: #94a3b8; color: #334155; }
         .btn-next { background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
         .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
 
         /* FOOTER PATEN */
         .footer-area {
-            background: #f8fafc; text-align: center; padding: 20px;
-            border-top: 1px solid #e2e8f0; margin-top: auto;
+            background: rgba(255, 255, 255, 0.5); text-align: center; padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.4); margin-top: auto;
         }
         .footer-links a { color: #64748b; text-decoration: none; font-size: 12px; font-weight: 600; margin: 0 10px; transition: 0.2s; }
         .footer-links a:hover { color: #2575fc; }
@@ -232,6 +244,7 @@
     </div>
 
     <audio id="soundBenar" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="soundSalah" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3" preload="auto"></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -290,7 +303,10 @@
         const areaKontrolLanjut = document.getElementById('areaKontrolLanjut');
         const skorElement = document.getElementById('skorUser');
         const modalOverlay = document.getElementById('modalOverlay');
+        
+        // Element Audio
         const soundBenar = document.getElementById('soundBenar');
+        const soundSalah = document.getElementById('soundSalah');
 
         // FUNGSI ANIMASI TYPEWRITER MATERI
         let materiIndex = 0;
@@ -303,9 +319,9 @@
                 currentText += materiArray[materiIndex].charAt(charIndex);
                 materiEl.innerHTML = currentText;
                 charIndex++;
-                setTimeout(typeWriter, 50); // Kecepatan ngetik
+                setTimeout(typeWriter, 50);
             } else {
-                setTimeout(hapusWriter, 8000); // Tunggu 8 detik sebelum ganti paragraf
+                setTimeout(hapusWriter, 8000); 
             }
         }
 
@@ -322,12 +338,12 @@
         setInterval(() => {
             humorIndex = (humorIndex + 1) % humorArray.length;
             humorEl.textContent = humorArray[humorIndex];
-        }, 10000); // Ganti tiap 10 detik
+        }, 10000); 
 
         async function init() {
             if (!userID) { window.location.href = 'index.html'; return; }
             skorElement.textContent = skor;
-            typeWriter(); // Mulai animasi ketik
+            typeWriter(); 
             
             try {
                 const qUser = query(collection(db, "users_session"), where("userID", "==", userID));
@@ -362,11 +378,9 @@
             soalSaatIni = soalTersedia[idx];
             soalTersedia.splice(idx, 1);
 
-            // Tampilkan Gambar Full
             document.getElementById('imgDepan').src = soalSaatIni.imgDepan;
             document.getElementById('imgBelakang').src = soalSaatIni.imgBelakang;
             
-            // Pertanyaan di kotak bawah
             teksSoal.innerHTML = `<strong>Pertanyaan:</strong><br>${soalSaatIni.pertanyaan}`;
 
             flashcard.classList.remove('is-flipped');
@@ -374,7 +388,6 @@
             pesanFeedback.innerHTML = '';
             areaInput.style.display = 'flex';
             areaKontrolLanjut.style.display = 'none';
-            // inputJawab.focus(); // DIHILANGKAN agar keyboard tidak otomatis naik
         }
 
         btnKirim.onclick = async () => {
@@ -382,16 +395,17 @@
             const jAsli = soalSaatIni.jawaban.trim().toUpperCase();
 
             if (!jUser) { 
-                pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-triangle-exclamation"></i> Diisi dulu dong jawabannya!</span>'; 
+                pesanFeedback.innerHTML = '<span class="msg-error" style="animation: none;"><i class="fa-solid fa-triangle-exclamation"></i> Diisi dulu dong jawabannya!</span>'; 
                 return; 
             }
 
             if (jUser === jAsli) {
-                // JAWABAN BENAR
+                // --- JAWABAN BENAR ---
                 pesanFeedback.innerHTML = '<span class="msg-success"><i class="fa-solid fa-circle-check"></i> Luar Biasa! Jawaban Tepat.</span>';
                 
-                // MEMAINKAN SOUND & KONFETI
-                soundBenar.play();
+                soundBenar.currentTime = 0;
+                soundBenar.play().catch(e => console.log(e));
+                
                 confetti({
                     particleCount: 150,
                     spread: 80,
@@ -404,15 +418,30 @@
                 sessionStorage.setItem('skorLocal', skor);
                 if (userDocRef) updateDoc(userDocRef, { skor: skor });
 
-                // Ubah Teks Soal menjadi Teks Jawaban Benar
                 teksSoal.innerHTML = `<span style="color:#10b981;"><strong>Kunci Jawaban:</strong><br>${soalSaatIni.jawaban}</span>`;
 
                 flashcard.classList.add('is-flipped');
                 areaInput.style.display = 'none';
                 areaKontrolLanjut.style.display = 'flex';
+                
             } else {
-                // JAWABAN SALAH
+                // --- JAWABAN SALAH ---
                 pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-xmark"></i> Kurang tepat. Coba cek lagi!</span>';
+                
+                // Mainkan suara Tetot
+                soundSalah.currentTime = 0;
+                soundSalah.play().catch(e => console.log(e));
+
+                // Fitur Getar Haptic (Akan bergetar 300ms, jeda 100ms, bergetar 300ms)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([300, 100, 300]);
+                }
+
+                // Efek Animasi Goyang (Shake) pada form input
+                inputJawab.style.transform = "translateX(-10px)";
+                setTimeout(() => inputJawab.style.transform = "translateX(10px)", 100);
+                setTimeout(() => inputJawab.style.transform = "translateX(-10px)", 200);
+                setTimeout(() => inputJawab.style.transform = "translateX(0)", 300);
             }
         };
 
