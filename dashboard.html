@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anekdot.io - Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -17,35 +17,46 @@
         }
 
         body {
-            background: #f0f4f8; /* Latar yang lebih lembut */
+            /* Latar Belakang Premium Bergerak */
+            background: linear-gradient(-45deg, #eef2f3, #e0eafc, #cfdef3, #fdfbfb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: #333;
             min-height: 100vh;
         }
 
-        /* Container utama dengan Flexbox agar footer bisa dipatenkan ke bawah */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .app-container {
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
             position: relative;
             display: flex;
             flex-direction: column; 
+            overflow-x: hidden;
         }
 
-        /* Header Dibalik (Inverted) */
+        /* HEADER PREMIUM */
         header {
-            background: #2575fc; /* Latar biru */
-            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 20;
         }
 
         .header-left {
@@ -55,78 +66,98 @@
         }
 
         .logo-mini {
-            width: 35px;
-            height: 35px;
-            background: #fff; /* Latar putih */
-            color: #2575fc; /* Teks biru */
-            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            color: #fff;
+            border-radius: 12px; /* Bentuk squircle */
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 18px;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
         }
 
         .app-title {
-            font-weight: 700;
+            font-weight: 800;
             font-size: 18px;
-            color: #fff; /* Teks putih */
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: 0.5px;
         }
 
         .btn-logout {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: #fff;
-            width: 35px;
-            height: 35px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .btn-logout:hover {
-            background: #ff4757;
-            transform: rotate(90deg);
+            background: #ef4444;
+            color: #fff;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
         }
 
-        /* Area Konten melar memenuhi sisa layar */
+        /* AREA KONTEN */
         .content {
             padding: 20px;
             flex-grow: 1; 
         }
 
-        /* Kartu Sapaan dengan Animasi Gradasi */
+        /* KARTU SAPAAN (HERO) */
         .welcome-card {
-            background: linear-gradient(-45deg, #2575fc, #6a11cb, #d81b60, #ffb300);
+            background: linear-gradient(-45deg, #2575fc, #6a11cb, #ec4899, #ffb300);
             background-size: 400% 400%;
-            animation: gradientAnim 8s ease infinite;
+            animation: heroGradient 10s ease infinite;
             color: white;
-            padding: 25px 20px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(37, 117, 252, 0.3);
+            padding: 30px 20px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(37, 117, 252, 0.3);
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes gradientAnim {
+        .welcome-card::before {
+            content: '';
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            animation: rotateLight 10s linear infinite;
+        }
+
+        @keyframes heroGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        .welcome-card h2 {
-            font-size: 22px;
-            margin-bottom: 5px;
-            font-weight: 700;
-            min-height: 33px; /* Mencegah loncat saat efek ngetik berjalan */
+        @keyframes rotateLight {
+            100% { transform: rotate(360deg); }
         }
 
-        /* Efek kedip kursor mesin tik */
+        .welcome-card h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 800;
+            position: relative;
+            z-index: 2;
+            min-height: 39px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
         .cursor {
             display: inline-block;
             width: 3px;
@@ -134,117 +165,126 @@
             animation: blink 1s step-end infinite;
         }
 
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
+        @keyframes blink { 50% { opacity: 0; } }
 
         .welcome-card p {
             font-size: 14px;
-            opacity: 0.9;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+            font-weight: 500;
         }
 
-        /* Menu Section Modern */
+        /* MENU SECTION */
         .section-title {
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             margin-bottom: 15px;
-            color: #444;
+            color: #64748b;
             display: flex;
             align-items: center;
             gap: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .menu-btn {
             display: flex;
             align-items: center;
-            padding: 15px 20px;
-            background: #fff;
-            border: none;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
             text-decoration: none;
-            color: #333;
+            color: #1e293b;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border: 1px solid #f1f5f9;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn::after {
+            content: ''; position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%); width: 30px; height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" fill="%23cbd5e1"><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>') no-repeat center;
+            opacity: 0.5; transition: 0.3s;
         }
 
         .menu-btn:hover {
-            transform: translateY(-5px) scale(1.01);
-            box-shadow: 0 12px 25px rgba(37, 117, 252, 0.15);
-            border-color: #e3f2fd;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(37, 117, 252, 0.15);
+            background: #fff;
+            border-color: #e2e8f0;
+        }
+
+        .menu-btn:hover::after {
+            right: 15px; opacity: 1;
         }
 
         .menu-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 15px;
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            margin-right: 15px;
+            font-size: 24px;
+            margin-right: 18px;
+            flex-shrink: 0;
+            transition: 0.3s;
         }
 
-        .icon-belajar { background: #e0f2fe; color: #3b82f6; }
-        .icon-challenge { background: #fce7f3; color: #ec4899; }
-        .icon-materi { background: #dcfce7; color: #22c55e; }
-        .icon-leaderboard { background: #fef3c7; color: #eab308; }
+        .menu-btn:hover .menu-icon { transform: scale(1.1); }
+
+        .icon-belajar { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);}
+        .icon-challenge { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; box-shadow: 0 4px 10px rgba(190, 24, 93, 0.2);}
+        .icon-materi { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; box-shadow: 0 4px 10px rgba(22, 101, 52, 0.2);}
+        .icon-leaderboard { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #b45309; box-shadow: 0 4px 10px rgba(180, 83, 9, 0.2);}
 
         .menu-text h4 {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 2px;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 4px;
         }
 
         .menu-text span {
             display: block;
-            font-size: 12px;
+            font-size: 13px;
             color: #64748b;
             font-weight: 500;
+            line-height: 1.4;
         }
 
-        /* Footer Modern Paten di Bawah */
+        /* FOOTER PATEN */
         .footer-area {
-            background: #f8fafc;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
             text-align: center;
             padding: 20px;
-            border-top: 1px solid #e2e8f0;
-            margin-top: auto; /* Ini yang bikin dia ditarik ke bawah */
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            margin-top: auto; 
         }
 
-        .footer-links {
-            margin-bottom: 8px;
-        }
-
+        .footer-links { margin-bottom: 8px; }
         .footer-links a {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 0 10px;
-            transition: color 0.2s;
+            color: #64748b; text-decoration: none; font-size: 13px;
+            font-weight: 700; margin: 0 10px; transition: color 0.2s;
         }
-
         .footer-links a:hover { color: #2575fc; }
 
-        .copyright {
-            font-size: 11px;
-            color: #94a3b8;
-        }
+        .copyright { font-size: 11px; color: #94a3b8; font-weight: 500;}
 
         /* CUSTOM MODAL LOGOUT */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);
             display: none; align-items: center; justify-content: center;
             z-index: 2000; opacity: 0; transition: opacity 0.3s ease;
         }
@@ -253,29 +293,30 @@
         .modal-box {
             background: #fff; padding: 30px; border-radius: 25px;
             max-width: 320px; width: 90%; text-align: center;
-            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            transform: scale(0.8) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.5);
         }
-        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
 
         .modal-icon {
-            width: 70px; height: 70px; background: #fee2e2; color: #ef4444;
+            width: 80px; height: 80px; background: linear-gradient(135deg, #fee2e2, #fecaca); color: #ef4444;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; margin: 0 auto 15px;
+            font-size: 35px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
         }
 
-        .modal-box h3 { font-size: 18px; color: #1e293b; margin-bottom: 8px; }
-        .modal-box p { font-size: 13px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
+        .modal-box h3 { font-size: 20px; color: #1e293b; margin-bottom: 10px; font-weight: 800;}
+        .modal-box p { font-size: 13px; color: #64748b; margin-bottom: 25px; line-height: 1.6; }
 
-        .modal-actions { display: flex; gap: 10px; }
+        .modal-actions { display: flex; gap: 12px; }
         .btn-modal {
-            flex: 1; padding: 12px; border-radius: 12px; font-weight: 600;
-            font-size: 14px; cursor: pointer; border: none; transition: 0.2s;
+            flex: 1; padding: 14px; border-radius: 15px; font-weight: 700;
+            font-size: 14px; cursor: pointer; border: none; transition: 0.3s;
         }
         .btn-cancel { background: #f1f5f9; color: #64748b; }
-        .btn-cancel:hover { background: #e2e8f0; }
-        .btn-confirm { background: #ef4444; color: white; }
-        .btn-confirm:hover { background: #dc2626; }
+        .btn-cancel:hover { background: #e2e8f0; color: #334155; }
+        .btn-confirm { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 8px 15px rgba(239, 68, 68, 0.3); }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(239, 68, 68, 0.4); }
     </style>
 </head>
 <body>
@@ -283,7 +324,7 @@
     <div class="app-container">
         <header>
             <div class="header-left">
-                <div class="logo-mini">A.</div>
+                <div class="logo-mini">A</div>
                 <div class="app-title">Anekdot.io</div>
             </div>
             <button class="btn-logout" id="btnLogout" title="Keluar">
@@ -294,16 +335,18 @@
         <main class="content">
             <div class="welcome-card">
                 <h2><span id="displayNama"></span><span class="cursor">&nbsp;</span></h2>
-                <p>Selamat datang di arena bermain dan belajar.</p>
-                </div>
+                <p>Selamat datang di arena belajar interaktif.</p>
+            </div>
 
-            <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> Arena Belajar</h3>
+            <h3 class="section-title">
+                <i class="fa-solid fa-gamepad" style="color: #3b82f6;"></i> Arena Belajar
+            </h3>
             <div class="menu-grid">
                 <a href="belajar.html" class="menu-btn">
                     <div class="menu-icon icon-belajar"><i class="fa-solid fa-layer-group"></i></div>
                     <div class="menu-text">
                         <h4>Kartu Belajar</h4>
-                        <span>Tebak struktur & kumpulkan poin</span>
+                        <span>Tebak struktur & kumpulkan poin anekdot</span>
                     </div>
                 </a>
 
@@ -311,18 +354,20 @@
                     <div class="menu-icon icon-challenge"><i class="fa-solid fa-pen-nib"></i></div>
                     <div class="menu-text">
                         <h4>Kartu Challenge</h4>
-                        <span>Buat teks anekdot karyamu sendiri</span>
+                        <span>Buat teks karyamu sendiri & uji dengan AI</span>
                     </div>
                 </a>
             </div>
 
-            <h3 class="section-title"><i class="fa-solid fa-book-open"></i> Pustaka & Skor</h3>
+            <h3 class="section-title">
+                <i class="fa-solid fa-book-open" style="color: #10b981;"></i> Pustaka & Skor
+            </h3>
             <div class="menu-grid">
                 <a href="materi.html" class="menu-btn">
                     <div class="menu-icon icon-materi"><i class="fa-solid fa-file-lines"></i></div>
                     <div class="menu-text">
                         <h4>Materi Anekdot</h4>
-                        <span>Pelajari teori lengkapnya di sini</span>
+                        <span>Pelajari teori lengkapnya di perpustakaan</span>
                     </div>
                 </a>
 
@@ -338,8 +383,8 @@
 
         <div class="footer-area">
             <div class="footer-links">
-                <a href="privasi.html">Kebijakan Privasi</a> •
-                <a href="privasi.html">Kredit</a>
+                <a href="privasi.html">Sistem & Kebijakan</a> •
+                <a href="privasi.html">Kredit Dev</a>
             </div>
             <div class="copyright">© 2026 Anekdot.io by Cendekia Aksara</div>
         </div>
@@ -348,7 +393,7 @@
     <div class="modal-overlay" id="modalLogout">
         <div class="modal-box">
             <div class="modal-icon"><i class="fa-solid fa-door-open"></i></div>
-            <h3>Yakin Ingin Keluar?</h3>
+            <h3>Yakin Keluar?</h3>
             <p>Sesi permainanmu saat ini akan diakhiri dan datamu akan dihapus dari papan peringkat.</p>
             <div class="modal-actions">
                 <button class="btn-modal btn-cancel" id="btnCancelLogout">Batal</button>
@@ -391,13 +436,11 @@
                 if (indexHuruf < textSapaan.length) {
                     displayNama.textContent += textSapaan.charAt(indexHuruf);
                     indexHuruf++;
-                    // Kecepatan ngetik (100ms)
-                    setTimeout(ngetikAnimasi, 100); 
+                    // Kecepatan ngetik
+                    setTimeout(ngetikAnimasi, 80); 
                 }
             }
-            // Mulai animasi setengah detik setelah halaman dibuka
-            setTimeout(ngetikAnimasi, 500);
-
+            setTimeout(ngetikAnimasi, 400);
 
             // 2. LOGIKA MODAL LOGOUT
             const btnLogout = document.getElementById('btnLogout');
@@ -408,8 +451,8 @@
             // Buka Modal
             btnLogout.addEventListener('click', () => {
                 modalLogout.style.display = 'flex';
-                // Sedikit delay untuk memicu animasi CSS scale
                 setTimeout(() => modalLogout.classList.add('active'), 10);
+                if ("vibrate" in navigator) navigator.vibrate(50);
             });
 
             // Tutup Modal (Batal)
@@ -420,7 +463,6 @@
 
             // Eksekusi Keluar (Hapus Data Firebase)
             btnConfirmLogout.addEventListener('click', async () => {
-                // Ubah tombol jadi loading
                 btnConfirmLogout.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                 btnConfirmLogout.disabled = true;
 
