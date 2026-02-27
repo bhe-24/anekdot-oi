@@ -16,19 +16,13 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Latar Belakang Statis (Ringan & Elegan) */
         body {
-            /* Latar Belakang Premium Bergerak */
-            background: linear-gradient(-45deg, #eef2f3, #e0eafc, #cfdef3, #fdfbfb);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-color: #f8fafc;
+            background-image: radial-gradient(circle at top right, #e0f2fe 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, #fce7f3 0%, transparent 40%);
             color: #333;
             min-height: 100vh;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .app-container {
@@ -36,8 +30,7 @@
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7); /* Transparansi sangat tipis */
             box-shadow: 0 0 40px rgba(0,0,0,0.05);
             position: relative;
             display: flex;
@@ -45,18 +38,20 @@
             overflow-x: hidden;
         }
 
-        /* HEADER PREMIUM */
+        /* HEADER PATEN (Fix di Atas) */
         header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.95); /* Hampir solid agar teks mudah dibaca */
+            backdrop-filter: blur(10px); /* Blur hanya di area header (Sangat Ringan) */
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
-            z-index: 20;
+            z-index: 50;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
         }
 
         .header-left {
@@ -66,22 +61,22 @@
         }
 
         .logo-mini {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, #2575fc, #6a11cb);
             color: #fff;
-            border-radius: 12px; /* Bentuk squircle */
+            border-radius: 10px; 
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 20px;
+            font-size: 18px;
             box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
         }
 
         .app-title {
             font-weight: 800;
-            font-size: 18px;
+            font-size: 17px;
             background: linear-gradient(135deg, #2575fc, #6a11cb);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -89,13 +84,13 @@
         }
 
         .btn-logout {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: #fee2e2;
             color: #ef4444;
-            width: 38px;
-            height: 38px;
+            border: none;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
@@ -107,7 +102,7 @@
             background: #ef4444;
             color: #fff;
             transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
         }
 
         /* AREA KONTEN */
@@ -116,26 +111,19 @@
             flex-grow: 1; 
         }
 
-        /* KARTU SAPAAN (HERO) */
+        /* KARTU SAPAAN (HERO) dengan Gradasi Animasi Terlokalisasi */
         .welcome-card {
             background: linear-gradient(-45deg, #2575fc, #6a11cb, #ec4899, #ffb300);
-            background-size: 400% 400%;
-            animation: heroGradient 10s ease infinite;
+            background-size: 300% 300%;
+            animation: heroGradient 8s ease infinite;
             color: white;
-            padding: 30px 20px;
-            border-radius: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 35px rgba(37, 117, 252, 0.3);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(37, 117, 252, 0.25);
             text-align: center;
             position: relative;
             overflow: hidden;
-        }
-
-        .welcome-card::before {
-            content: '';
-            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-            animation: rotateLight 10s linear infinite;
         }
 
         @keyframes heroGradient {
@@ -144,18 +132,13 @@
             100% { background-position: 0% 50%; }
         }
 
-        @keyframes rotateLight {
-            100% { transform: rotate(360deg); }
-        }
-
         .welcome-card h2 {
-            font-size: 26px;
-            margin-bottom: 8px;
+            font-size: 22px;
+            margin-bottom: 5px;
             font-weight: 800;
             position: relative;
             z-index: 2;
-            min-height: 39px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-height: 33px;
         }
 
         .cursor {
@@ -168,8 +151,8 @@
         @keyframes blink { 50% { opacity: 0; } }
 
         .welcome-card p {
-            font-size: 14px;
-            opacity: 0.95;
+            font-size: 13px;
+            opacity: 0.9;
             position: relative;
             z-index: 2;
             font-weight: 500;
@@ -177,9 +160,9 @@
 
         /* MENU SECTION */
         .section-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #64748b;
             display: flex;
             align-items: center;
@@ -191,132 +174,130 @@
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
+        /* KARTU MENU SOLID (Tanpa Backdrop Filter agar super ringan) */
         .menu-btn {
             display: flex;
             align-items: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
+            padding: 16px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
             text-decoration: none;
             color: #1e293b;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
             position: relative;
             overflow: hidden;
         }
 
         .menu-btn::after {
-            content: ''; position: absolute; right: 20px; top: 50%;
-            transform: translateY(-50%); width: 30px; height: 30px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" fill="%23cbd5e1"><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>') no-repeat center;
-            opacity: 0.5; transition: 0.3s;
+            content: '\f054'; /* Icon panah kanan FontAwesome */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%);
+            color: #cbd5e1; font-size: 16px;
+            opacity: 0; transition: 0.3s;
         }
 
         .menu-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(37, 117, 252, 0.15);
-            background: #fff;
-            border-color: #e2e8f0;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(37, 117, 252, 0.1);
+            border-color: #bfdbfe;
         }
 
         .menu-btn:hover::after {
-            right: 15px; opacity: 1;
+            right: 15px; opacity: 1; color: #3b82f6;
         }
 
         .menu-icon {
-            width: 55px;
-            height: 55px;
-            border-radius: 16px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-right: 18px;
+            font-size: 20px;
+            margin-right: 15px;
             flex-shrink: 0;
             transition: 0.3s;
         }
 
-        .menu-btn:hover .menu-icon { transform: scale(1.1); }
+        .menu-btn:hover .menu-icon { transform: scale(1.1) rotate(-5deg); }
 
-        .icon-belajar { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);}
-        .icon-challenge { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; box-shadow: 0 4px 10px rgba(190, 24, 93, 0.2);}
-        .icon-materi { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; box-shadow: 0 4px 10px rgba(22, 101, 52, 0.2);}
-        .icon-leaderboard { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #b45309; box-shadow: 0 4px 10px rgba(180, 83, 9, 0.2);}
+        .icon-belajar { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7; }
+        .icon-challenge { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; }
+        .icon-materi { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
+        .icon-leaderboard { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #b45309; }
 
         .menu-text h4 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .menu-text span {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             color: #64748b;
             font-weight: 500;
             line-height: 1.4;
         }
 
-        /* FOOTER PATEN */
+        /* FOOTER */
         .footer-area {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
             text-align: center;
             padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.5);
             margin-top: auto; 
         }
 
-        .footer-links { margin-bottom: 8px; }
+        .footer-links { margin-bottom: 6px; }
         .footer-links a {
-            color: #64748b; text-decoration: none; font-size: 13px;
-            font-weight: 700; margin: 0 10px; transition: color 0.2s;
+            color: #64748b; text-decoration: none; font-size: 12px;
+            font-weight: 700; margin: 0 8px; transition: color 0.2s;
         }
         .footer-links a:hover { color: #2575fc; }
-
         .copyright { font-size: 11px; color: #94a3b8; font-weight: 500;}
 
-        /* CUSTOM MODAL LOGOUT */
+        /* MODAL LOGOUT */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.6); 
             display: none; align-items: center; justify-content: center;
             z-index: 2000; opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; }
         
         .modal-box {
-            background: #fff; padding: 30px; border-radius: 25px;
-            max-width: 320px; width: 90%; text-align: center;
+            background: #fff; padding: 25px; border-radius: 20px;
+            max-width: 300px; width: 90%; text-align: center;
             transform: scale(0.8) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
         .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
 
         .modal-icon {
-            width: 80px; height: 80px; background: linear-gradient(135deg, #fee2e2, #fecaca); color: #ef4444;
+            width: 60px; height: 60px; background: linear-gradient(135deg, #fee2e2, #fecaca); color: #ef4444;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 35px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+            font-size: 28px; margin: 0 auto 15px; box-shadow: 0 8px 15px rgba(239, 68, 68, 0.2);
         }
 
-        .modal-box h3 { font-size: 20px; color: #1e293b; margin-bottom: 10px; font-weight: 800;}
-        .modal-box p { font-size: 13px; color: #64748b; margin-bottom: 25px; line-height: 1.6; }
+        .modal-box h3 { font-size: 18px; color: #1e293b; margin-bottom: 8px; font-weight: 800;}
+        .modal-box p { font-size: 12px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
 
-        .modal-actions { display: flex; gap: 12px; }
+        .modal-actions { display: flex; gap: 10px; }
         .btn-modal {
-            flex: 1; padding: 14px; border-radius: 15px; font-weight: 700;
-            font-size: 14px; cursor: pointer; border: none; transition: 0.3s;
+            flex: 1; padding: 12px; border-radius: 12px; font-weight: 700;
+            font-size: 13px; cursor: pointer; border: none; transition: 0.3s;
         }
         .btn-cancel { background: #f1f5f9; color: #64748b; }
         .btn-cancel:hover { background: #e2e8f0; color: #334155; }
-        .btn-confirm { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 8px 15px rgba(239, 68, 68, 0.3); }
-        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(239, 68, 68, 0.4); }
+        .btn-confirm { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(239, 68, 68, 0.3); }
     </style>
 </head>
 <body>
@@ -354,7 +335,7 @@
                     <div class="menu-icon icon-challenge"><i class="fa-solid fa-pen-nib"></i></div>
                     <div class="menu-text">
                         <h4>Kartu Challenge</h4>
-                        <span>Buat teks karyamu sendiri & uji dengan AI</span>
+                        <span>Buat teks cerita karyamu sendiri</span>
                     </div>
                 </a>
             </div>
@@ -436,7 +417,6 @@
                 if (indexHuruf < textSapaan.length) {
                     displayNama.textContent += textSapaan.charAt(indexHuruf);
                     indexHuruf++;
-                    // Kecepatan ngetik
                     setTimeout(ngetikAnimasi, 80); 
                 }
             }
@@ -448,20 +428,17 @@
             const btnCancelLogout = document.getElementById('btnCancelLogout');
             const btnConfirmLogout = document.getElementById('btnConfirmLogout');
 
-            // Buka Modal
             btnLogout.addEventListener('click', () => {
                 modalLogout.style.display = 'flex';
                 setTimeout(() => modalLogout.classList.add('active'), 10);
                 if ("vibrate" in navigator) navigator.vibrate(50);
             });
 
-            // Tutup Modal (Batal)
             btnCancelLogout.addEventListener('click', () => {
                 modalLogout.classList.remove('active');
                 setTimeout(() => modalLogout.style.display = 'none', 300);
             });
 
-            // Eksekusi Keluar (Hapus Data Firebase)
             btnConfirmLogout.addEventListener('click', async () => {
                 btnConfirmLogout.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                 btnConfirmLogout.disabled = true;
