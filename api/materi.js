@@ -34,8 +34,10 @@ module.exports = async function handler(req, res) {
 
         // Inisialisasi Gemini dengan API Key
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        // Menggunakan model flash yang super cepat
-        const model = genAI.getGenerativeModel({ model: "gemma-3-24b-it" });
+        
+        // MENGGUNAKAN MODEL GEMMA DARI GOOGLE
+        // gemma-2-27b-it adalah model Gemma tercerdas saat ini di Google AI Studio
+        const model = genAI.getGenerativeModel({ model: "gemma-2-27b-it" });
 
         // Prompt khusus untuk menyusun materi
         const promptSystem = `
@@ -60,9 +62,9 @@ module.exports = async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('Error saat memanggil AI Gemini:', error);
+        console.error('Error saat memanggil AI Gemma:', error);
         res.status(500).json({ 
-            error: 'AI sedang sibuk atau terjadi kesalahan internal.',
+            error: 'Gemma sedang sibuk atau terjadi kesalahan internal.',
             details: error.message
         });
     }
