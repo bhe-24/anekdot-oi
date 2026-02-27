@@ -5,200 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anekdot.io - Papan Peringkat</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        body {
-            background: #fff8e1; /* Latar kuning sangat muda (tema piala/juara) */
-            color: #333;
-            min-height: 100vh;
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* Latar gelap premium */
+            color: #333; min-height: 100vh; 
         }
 
         .app-container {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
+            background: #fff; box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            position: relative; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Header */
+        /* HEADER */
         header {
-            background: #fff;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: #fff; padding: 15px 20px; display: flex; align-items: center;
+            border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 20;
+        }
+        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; transition: 0.3s;}
+        .btn-back:hover { color: #ffb300; transform: translateX(-3px); }
+        .header-title { font-weight: 700; font-size: 16px; color: #f59e0b; flex-grow: 1; }
+
+        /* HERO & PODIUM AREA */
+        .podium-section {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white; padding: 30px 20px 0; text-align: center;
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.3); position: relative;
         }
 
-        .btn-back {
-            color: #555;
-            font-size: 20px;
-            text-decoration: none;
-            margin-right: 15px;
+        .hero-title h1 { font-size: 24px; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);}
+        .hero-title p { font-size: 13px; color: #94a3b8; margin-bottom: 25px; }
+
+        /* KOTAK PODIUM FLEXBOX */
+        .podium-container {
+            display: flex; justify-content: center; align-items: flex-end;
+            gap: 10px; height: 200px; padding-bottom: 20px;
         }
 
-        .header-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #ffb300;
-            flex-grow: 1;
+        .podium-item {
+            display: flex; flex-direction: column; align-items: center;
+            width: 30%; position: relative;
         }
 
-        /* Hero / Pengantar */
-        .hero-section {
-            background: linear-gradient(135deg, #ffb300 0%, #ff8f00 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 5px 15px rgba(255, 179, 0, 0.3);
-            margin-bottom: 20px;
+        /* Detail Profil Podium */
+        .podium-profile {
+            display: flex; flex-direction: column; align-items: center;
+            margin-bottom: 10px; z-index: 2; position: absolute; bottom: 100%; width: 100%;
+        }
+        .podium-rank-badge {
+            width: 30px; height: 30px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
+            color: #fff; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .podium-name { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;}
+        .podium-score { font-size: 14px; font-weight: 800; color: #fff; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; margin-top: 3px;}
+
+        /* Balok Podium */
+        .podium-bar {
+            width: 100%; border-top-left-radius: 10px; border-top-right-radius: 10px;
+            box-shadow: inset 0 5px 15px rgba(255,255,255,0.3), 0 5px 15px rgba(0,0,0,0.5);
+            background-size: 200% 200%; animation: shimmer 3s ease infinite;
         }
 
-        .hero-section i {
-            font-size: 40px;
-            margin-bottom: 10px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+        @keyframes shimmer { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .hero-section h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
-        }
+        /* Juara 1 (Tengah) */
+        .rank-1 { order: 2; height: 160px; }
+        .rank-1 .podium-bar { height: 100%; background-image: linear-gradient(45deg, #f59e0b, #fbbf24, #fde68a, #f59e0b); }
+        .rank-1 .podium-rank-badge { background: #f59e0b; width: 40px; height: 40px; font-size: 18px; border: 2px solid #fff;}
+        .rank-1 .podium-name { font-size: 14px; color: #fbbf24; text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
 
-        .hero-section p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
+        /* Juara 2 (Kiri) */
+        .rank-2 { order: 1; height: 120px; }
+        .rank-2 .podium-bar { height: 100%; background-image: linear-gradient(45deg, #94a3b8, #cbd5e1, #f1f5f9, #94a3b8); }
+        .rank-2 .podium-rank-badge { background: #94a3b8; }
+        .rank-2 .podium-name { color: #cbd5e1; }
 
-        /* Daftar Leaderboard */
-        .leaderboard-list {
-            padding: 0 20px 30px;
-            list-style: none;
-        }
+        /* Juara 3 (Kanan) */
+        .rank-3 { order: 3; height: 90px; }
+        .rank-3 .podium-bar { height: 100%; background-image: linear-gradient(45deg, #b45309, #d97706, #fcd34d, #b45309); }
+        .rank-3 .podium-rank-badge { background: #d97706; }
+        .rank-3 .podium-name { color: #fcd34d; }
 
-        .rank-item {
-            display: flex;
-            align-items: center;
-            background: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
-            border: 1px solid #f0f0f0;
-            transition: transform 0.2s;
+        /* DAFTAR PERINGKAT 4-10 */
+        .leaderboard-list { padding: 20px 20px 40px; list-style: none; background: #f8fafc; flex-grow: 1; }
+        .list-item {
+            display: flex; align-items: center; background: #fff; padding: 15px;
+            border-radius: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0; transition: transform 0.2s;
         }
+        .list-item:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
 
-        .rank-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        .list-number {
+            width: 35px; height: 35px; border-radius: 50%; background: #f1f5f9; color: #64748b;
+            display: flex; align-items: center; justify-content: center; font-weight: 800;
+            font-size: 14px; margin-right: 15px;
         }
-
-        /* Nomor Peringkat */
-        .rank-number {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #f5f5f5;
-            color: #777;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 16px;
-            margin-right: 15px;
-        }
-
-        /* Warna Khusus Top 3 */
-        .rank-1 { border-color: #ffd700; background: #fffdf0; }
-        .rank-1 .rank-number { background: #ffd700; color: #fff; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .list-info { flex-grow: 1; }
+        .list-name { font-weight: 700; color: #1e293b; font-size: 14px; margin-bottom: 2px; }
+        .list-id { font-size: 11px; color: #94a3b8; font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 6px; }
+        .list-score { font-weight: 800; font-size: 16px; color: #0f172a; display: flex; align-items: center; gap: 5px; }
         
-        .rank-2 { border-color: #c0c0c0; background: #fafafa; }
-        .rank-2 .rank-number { background: #c0c0c0; color: #fff; }
-        
-        .rank-3 { border-color: #cd7f32; background: #fffaf5; }
-        .rank-3 .rank-number { background: #cd7f32; color: #fff; }
+        /* Highlight Jika User Sedang Login */
+        .is-me { border-color: #3b82f6; background: #eff6ff; }
+        .is-me .list-name { color: #2563eb; }
+        .is-me .list-number { background: #3b82f6; color: white; }
 
-        /* Detail Pemain */
-        .player-info {
-            flex-grow: 1;
+        /* Loading & Empty State */
+        .loading-state, .empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 60px 20px; text-align: center; color: #64748b;
         }
-
-        .player-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 15px;
-            margin-bottom: 2px;
-        }
-
-        .player-id {
-            font-size: 11px;
-            color: #888;
-            font-family: monospace;
-            background: #eee;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        /* Skor */
-        .player-score {
-            font-weight: 700;
-            font-size: 18px;
-            color: #ff8f00;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Loading State */
-        .loading-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            text-align: center;
-            color: #666;
-        }
-
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #fff8e1;
-            border-top: 4px solid #ffb300;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #888;
-            padding: 30px;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -206,119 +137,146 @@
     <div class="app-container">
         <header>
             <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
-            <div class="header-title">Papan Peringkat</div>
+            <div class="header-title">Leaderboard</div>
         </header>
 
-        <div class="hero-section">
-            <i class="fa-solid fa-trophy"></i>
-            <h1>Top 10 Pelajar</h1>
-            <p>Bersainglah untuk menjadi yang terbaik di kelas!</p>
-        </div>
+        <section class="podium-section">
+            <div class="hero-title">
+                <h1>Hall of Fame</h1>
+                <p>10 Pelajar dengan poin anekdot tertinggi!</p>
+            </div>
 
-        <div class="loading-state" id="loadingState">
-            <div class="spinner"></div>
-            <div>Mengambil data skor dari server...</div>
-        </div>
-
-        <div class="empty-state" id="emptyState">
-            Belum ada data pemain. Jadilah yang pertama bermain!
-        </div>
+            <div class="podium-container" id="podiumArea">
+                </div>
+        </section>
 
         <ul class="leaderboard-list" id="leaderboardList">
-            </ul>
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <div>Mengambil data dari server...</div>
+            </div>
+        </ul>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+            Belum ada yang berani main. Jadilah yang pertama!
+        </div>
     </div>
+
+    <audio id="soundTada" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" preload="auto"></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase dari akunmu
         const firebaseConfig = {
             apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
             authDomain: "juararc-503f9.firebaseapp.com",
             projectId: "juararc-503f9",
             storageBucket: "juararc-503f9.firebasestorage.app",
             messagingSenderId: "306187241171",
-            appId: "1:306187241171:web:70285c8b2643acd0533626",
-            measurementId: "G-8PFY3WW9XL"
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
         };
 
-        // Inisialisasi Firebase & Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Fungsi Format Peringkat HTML
-        function buatElemenPeringkat(data, urutan, isCurrentUser) {
-            // Tentukan class khusus untuk Top 3
-            let rankClass = '';
-            if (urutan === 1) rankClass = 'rank-1';
-            else if (urutan === 2) rankClass = 'rank-2';
-            else if (urutan === 3) rankClass = 'rank-3';
-
-            // Jika ini adalah user yang sedang login, beri penanda "(Kamu)"
-            const namaTampil = isCurrentUser ? `${data.nama} <span style="color:#ff4757; font-size:12px;">(Kamu)</span>` : data.nama;
-
+        // FUNGSI RENDER PODIUM (TOP 3)
+        function buatPodium(data, urutan, isMe) {
+            const namaTampil = isMe ? `${data.nama} (Kamu)` : data.nama;
             return `
-                <li class="rank-item ${rankClass}">
-                    <div class="rank-number">${urutan}</div>
-                    <div class="player-info">
-                        <div class="player-name">${namaTampil}</div>
-                        <div class="player-id">${data.userID}</div>
+                <div class="podium-item rank-${urutan}">
+                    <div class="podium-profile">
+                        <div class="podium-name">${namaTampil}</div>
+                        <div class="podium-rank-badge">${urutan}</div>
+                        <div class="podium-score"><i class="fa-solid fa-star" style="font-size:10px; color:#fbbf24;"></i> ${data.skor}</div>
                     </div>
-                    <div class="player-score">
-                        ${data.skor || 0} <i class="fa-solid fa-star" style="font-size: 14px;"></i>
+                    <div class="podium-bar"></div>
+                </div>
+            `;
+        }
+
+        // FUNGSI RENDER LIST (RANK 4-10)
+        function buatList(data, urutan, isMe) {
+            const kelasMe = isMe ? 'is-me' : '';
+            const teksMe = isMe ? ' <span style="color:#ef4444; font-size:11px;">(Kamu)</span>' : '';
+            return `
+                <li class="list-item ${kelasMe}">
+                    <div class="list-number">${urutan}</div>
+                    <div class="list-info">
+                        <div class="list-name">${data.nama}${teksMe}</div>
+                        <div class="list-id">${data.userID}</div>
+                    </div>
+                    <div class="list-score">
+                        ${data.skor} <i class="fa-solid fa-star" style="font-size: 14px; color:#f59e0b;"></i>
                     </div>
                 </li>
             `;
         }
 
-        // Jalankan saat halaman dimuat
         document.addEventListener('DOMContentLoaded', async () => {
-            // Cek Sesi
             const currentUserID = sessionStorage.getItem('userID');
-            if (!currentUserID) {
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!currentUserID) { window.location.href = 'index.html'; return; }
 
             const loadingState = document.getElementById('loadingState');
             const leaderboardList = document.getElementById('leaderboardList');
+            const podiumArea = document.getElementById('podiumArea');
             const emptyState = document.getElementById('emptyState');
+            const soundTada = document.getElementById('soundTada');
 
             try {
-                // Ambil data dari koleksi "users_session"
-                // Urutkan berdasarkan "skor" menurun (desc), ambil 10 teratas
-                const q = query(
-                    collection(db, "users_session"), 
-                    orderBy("skor", "desc"), 
-                    limit(10)
-                );
-
+                const q = query(collection(db, "users_session"), orderBy("skor", "desc"), limit(10));
                 const querySnapshot = await getDocs(q);
 
                 loadingState.style.display = 'none';
 
                 if (querySnapshot.empty) {
-                    emptyState.style.display = 'block';
+                    emptyState.style.display = 'flex';
                     return;
                 }
 
                 let urutan = 1;
+                let podiumHTML = '';
                 let listHTML = '';
+                let masukTop3 = false;
 
                 querySnapshot.forEach((doc) => {
                     const dataPemain = doc.data();
                     const isCurrentUser = dataPemain.userID === currentUserID;
-                    
-                    listHTML += buatElemenPeringkat(dataPemain, urutan, isCurrentUser);
+
+                    // Cek jika user login masuk Top 3 untuk efek perayaan
+                    if (isCurrentUser && urutan <= 3) masukTop3 = true;
+
+                    // Pisahkan Top 3 ke Podium, sisanya ke List
+                    if (urutan <= 3) {
+                        podiumHTML += buatPodium(dataPemain, urutan, isCurrentUser);
+                    } else {
+                        listHTML += buatList(dataPemain, urutan, isCurrentUser);
+                    }
                     urutan++;
                 });
 
+                podiumArea.innerHTML = podiumHTML;
                 leaderboardList.innerHTML = listHTML;
 
+                // BERIKAN EFEK KEJUTAN JIKA USER MASUK TOP 3
+                if (masukTop3) {
+                    soundTada.play().catch(e => console.log(e)); // Putar Suara
+                    
+                    // Tembak Konfeti dari dua sisi bawah layar
+                    var duration = 3 * 1000;
+                    var end = Date.now() + duration;
+
+                    (function frame() {
+                        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.8 }, colors: ['#fbbf24', '#f59e0b', '#ffffff'] });
+                        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors: ['#fbbf24', '#f59e0b', '#ffffff'] });
+
+                        if (Date.now() < end) requestAnimationFrame(frame);
+                    }());
+                }
+
             } catch (error) {
-                console.error("Gagal mengambil data dari Firebase:", error);
-                loadingState.innerHTML = `<span style="color:#ff4757;">Gagal memuat papan peringkat. Pastikan koneksi internet stabil atau aturan database terbuka untuk dibaca (read: true).</span>`;
+                console.error("Gagal mengambil data:", error);
+                loadingState.innerHTML = `<span style="color:#ef4444;">Gagal memuat papan peringkat. Pastikan internet lancar.</span>`;
             }
         });
     </script>
