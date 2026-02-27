@@ -3,198 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anekdot.io - Privasi & Kredit</title>
+    <title>Anekdot.io - Kebijakan & Kredit</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* Latar Belakang Elegan & Akademis */
+        body { 
+            background: linear-gradient(-45deg, #f8fafc, #e0f2fe, #f1f5f9, #dbeafe);
+            background-size: 400% 400%;
+            animation: pastelGradient 15s ease infinite;
+            color: #333; min-height: 100vh; 
         }
 
-        body {
-            background: #f8f9fa;
-            color: #333;
-            min-height: 100vh;
+        @keyframes pastelGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
+        /* Container Glassmorphism */
         .app-container {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+            position: relative; display: flex; flex-direction: column;
         }
 
-        /* Header */
+        /* HEADER */
         header {
-            background: #fff;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.6); padding: 15px 20px; display: flex; align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5); position: sticky; top: 0; z-index: 20;
         }
+        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; cursor: pointer; transition: 0.3s;}
+        .btn-back:hover { color: #2575fc; transform: translateX(-3px); }
+        .header-title { font-weight: 700; font-size: 16px; color: #1e293b; flex-grow: 1; }
 
-        .btn-back {
-            color: #555;
-            font-size: 20px;
-            text-decoration: none;
-            margin-right: 15px;
-            cursor: pointer;
+        /* TAB NAVIGASI MODERN (PILL SHAPE) */
+        .tab-wrapper {
+            padding: 20px 20px 0;
         }
-
-        .header-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-            flex-grow: 1;
-        }
-
-        /* Tab Navigasi */
         .tab-container {
-            display: flex;
-            border-bottom: 2px solid #eee;
-            background: #fff;
+            display: flex; background: rgba(226, 232, 240, 0.6); border-radius: 20px; padding: 5px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
-
         .tab-btn {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            font-weight: 600;
-            color: #888;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
+            flex: 1; padding: 10px 15px; text-align: center; font-weight: 600; font-size: 13px;
+            color: #64748b; cursor: pointer; border-radius: 15px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-
         .tab-btn.active {
-            color: #2575fc;
-            border-bottom-color: #2575fc;
+            background: linear-gradient(135deg, #2575fc, #3b82f6); color: white;
+            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3); transform: translateY(-2px);
         }
 
-        /* Area Konten */
-        .content-area {
-            padding: 20px;
-            overflow-y: auto;
+        /* AREA KONTEN */
+        .content-area { padding: 20px; flex-grow: 1; overflow-y: auto; }
+        .tab-content { display: none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .tab-content.active { display: block; }
+
+        @keyframes popIn { 
+            from { opacity: 0; transform: translateY(10px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
         }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Tipografi Teks */
+        /* TIPOGRAFI TEKS ATURAN & HUKUM */
         .text-box {
-            font-size: 13px;
-            line-height: 1.6;
-            color: #555;
-            text-align: justify;
+            background: #fff; padding: 20px; border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.8);
+            font-size: 13px; line-height: 1.7; color: #475569; text-align: justify;
+        }
+        
+        .text-intro {
+            background: #eff6ff; padding: 15px; border-radius: 12px; margin-bottom: 20px;
+            border-left: 4px solid #2575fc; font-weight: 500; color: #1e3a8a;
         }
 
         .text-box h3 {
-            color: #2575fc;
-            font-size: 15px;
-            margin-top: 20px;
-            margin-bottom: 8px;
+            color: #1e293b; font-size: 15px; margin-top: 20px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
         }
+        .text-box h3 i { color: #2575fc; font-size: 16px; }
+        .text-box h3:first-child { margin-top: 0; }
+        .text-box p { margin-bottom: 12px; }
 
-        .text-box h3:first-child {
-            margin-top: 0;
-        }
-
-        .text-box p {
-            margin-bottom: 12px;
-        }
-
-        .text-box ul {
-            margin-bottom: 12px;
-            padding-left: 20px;
-        }
-
-        .text-box li {
-            margin-bottom: 5px;
-        }
-
-        /* Desain Kotak Kredit */
+        /* KOTAK KREDIT PROFIL PREMIUM */
         .credit-box {
-            background: #f8faff;
-            border: 1px solid #e3f2fd;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0;
+            border-radius: 20px; padding: 25px 20px; margin-bottom: 20px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04); position: relative; overflow: hidden;
+        }
+        .credit-box::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #2575fc, #ec4899);
         }
 
         .avatar {
-            width: 70px;
-            height: 70px;
-            background: #2575fc;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0 auto 10px;
-            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+            width: 80px; height: 80px; background: linear-gradient(135deg, #2575fc, #3b82f6);
+            color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; font-weight: 800; margin: 0 auto 15px;
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.3); border: 3px solid #fff;
         }
 
-        .credit-box h4 {
-            color: #333;
-            font-size: 16px;
-            margin-bottom: 2px;
+        .credit-box h4 { color: #0f172a; font-size: 18px; margin-bottom: 5px; font-weight: 700; }
+        .credit-box p.subtitle { color: #64748b; font-size: 13px; line-height: 1.5;}
+        
+        .org-badge {
+            display: inline-flex; align-items: center; gap: 6px; background: #fef2f2;
+            color: #ef4444; padding: 5px 12px; border-radius: 20px; font-weight: 600;
+            font-size: 12px; margin-top: 15px; border: 1px solid #fecaca;
         }
 
-        .credit-box p.subtitle {
-            color: #666;
-            font-size: 12px;
-            margin-bottom: 15px;
+        /* TECH STACK BUBBLES */
+        .tech-box {
+            background: #fff; padding: 20px; border-radius: 20px; border: 1px dashed #cbd5e1;
+            text-align: center;
         }
-
-        .divider {
-            height: 1px;
-            background: #e3f2fd;
-            margin: 15px 0;
-        }
-
-        .tech-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
+        .tech-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 15px; }
         .tech-badge {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #555;
+            background: #f1f5f9; border: 1px solid #e2e8f0; padding: 6px 12px;
+            border-radius: 20px; font-size: 11px; font-weight: 600; color: #475569;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
     </style>
 </head>
@@ -203,33 +134,40 @@
     <div class="app-container">
         <header>
             <a onclick="history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
-            <div class="header-title">Informasi Aplikasi</div>
+            <div class="header-title">Sistem & Kebijakan</div>
         </header>
 
-        <div class="tab-container">
-            <div class="tab-btn active" onclick="switchTab('privasi')">Kebijakan Privasi</div>
-            <div class="tab-btn" onclick="switchTab('kredit')">Kredit</div>
+        <div class="tab-wrapper">
+            <div class="tab-container">
+                <div class="tab-btn active" onclick="switchTab('aturan')"><i class="fa-solid fa-scale-balanced"></i> Aturan & Privasi</div>
+                <div class="tab-btn" onclick="switchTab('kredit')"><i class="fa-solid fa-code"></i> Kredit Dev</div>
+            </div>
         </div>
 
         <div class="content-area">
             
-            <div id="tab-privasi" class="tab-content active text-box">
-                <p>Selamat datang di <strong>Anekdot.io</strong>. Kami sangat menghargai privasi dan keamanan data setiap pelajar yang menggunakan platform ini. Berikut adalah penjelasan mengenai bagaimana aplikasi ini beroperasi.</p>
+            <div id="tab-aturan" class="tab-content active">
+                <div class="text-box">
+                    <div class="text-intro">
+                        Platform edukasi <strong>Anekdot.io</strong> dirancang sebagai media pembelajaran interaktif yang taat pada kaidah pendidikan dan regulasi digital di Indonesia.
+                    </div>
 
-                <h3>1. Data yang Kami Kumpulkan</h3>
-                <p>Aplikasi ini <strong>tidak meminta</strong> informasi pribadi yang sensitif (seperti email, nomor telepon, atau alamat rumah). Kami hanya meminta <strong>Nama Panggilan</strong> untuk keperluan sapaan di dalam game.</p>
-                <p>Selain nama, sistem secara otomatis akan merekam skor (poin) permainanmu dan menyimpannya bersama dengan ID Unik acak yang dibuat oleh sistem.</p>
+                    <h3><i class="fa-solid fa-book-open-reader"></i> Landasan Kurikulum</h3>
+                    <p>Seluruh materi, kuis, dan evaluasi cerdas pada aplikasi ini disusun secara sistematis merujuk pada Capaian Pembelajaran (CP) <strong>Kurikulum Merdeka</strong> dan Kompetensi Dasar (KD) <strong>Kurikulum 2013 (Kurtilas)</strong> untuk mata pelajaran Bahasa Indonesia tingkat SMA/SMK, khususnya pada silabus penguasaan Teks Anekdot.</p>
 
-                <h3>2. Penggunaan Data Teks AI</h3>
-                <p>Pada fitur "Kartu Challenge", teks anekdot yang kamu ketik akan dikirimkan secara aman ke server kami untuk dievaluasi oleh Kecerdasan Buatan (Google Gemini AI). Teks ini semata-mata digunakan untuk memberikan penilaian dan umpan balik otomatis, dan tidak akan didistribusikan ke pihak luar.</p>
+                    <h3><i class="fa-solid fa-shield-halved"></i> Kepatuhan Hukum & Privasi (UU PDP)</h3>
+                    <p>Sesuai dengan amanat <strong>Undang-Undang Pelindungan Data Pribadi (UU PDP)</strong> dan <strong>UU ITE</strong>, aplikasi ini menerapkan prinsip minimasi data. Kami <strong>tidak memungut</strong> identitas sensitif seperti nama lengkap asli, NIK, alamat, atau nomor telepon. Kami hanya mencatat "Nama Panggilan" atau "Username" (*pseudonym*) sekadar untuk keperluan gamifikasi (Papan Peringkat).</p>
 
-                <h3>3. Pengelolaan Sesi dan *Logout*</h3>
-                <p>Data namamu disimpan sementara di perangkat (HP/Laptop) menggunakan fitur <em>Session Storage</em>. Ketika kamu menekan tombol "Keluar" (Logout), seluruh riwayat sesi di perangkat tersebut akan dihapus secara otomatis. Namun, skor tertinggimu akan tetap tayang di Papan Peringkat (Leaderboard).</p>
+                    <h3><i class="fa-solid fa-microchip"></i> Pengolahan Data AI Edukatif</h3>
+                    <p>Teks karangan yang diinput siswa pada fitur "Kartu Challenge" dianalisis seketika oleh Kecerdasan Buatan (Google Gemini API). Teks tersebut dienkripsi, diproses murni untuk memberikan <em>feedback</em> akademis otomatis, dan tidak diperjualbelikan kepada pihak ketiga mana pun.</p>
 
-                <h3>4. Penggunaan Gambar</h3>
-                <p>Beberapa gambar yang ditampilkan di dalam aplikasi merupakan aset ilustrasi edukatif yang dikelola oleh Admin melalui penyimpanan pihak ketiga (ImgBB).</p>
+                    <h3><i class="fa-solid fa-user-lock"></i> Sesi Anonim (*Ephemeral Session*)</h3>
+                    <p>Sistem otentikasi kami bersifat sementara (*Session Storage*). Begitu pengguna menekan tombol "Keluar" di *Dashboard*, seluruh rekam jejak identitas lokal di perangkat lunak akan musnah secara permanen, memberikan ruang aman bagi perangkat pinjaman/laboratorium sekolah.</p>
 
-                <p style="margin-top: 20px; font-style: italic; color: #888;">Terakhir diperbarui: Februari 2026</p>
+                    <p style="margin-top: 25px; font-size: 11px; font-style: italic; color: #94a3b8; text-align: center;">
+                        Terakhir diperbarui: Februari 2026<br>Disetujui oleh Pengembang Sistem
+                    </p>
+                </div>
             </div>
 
             <div id="tab-kredit" class="tab-content">
@@ -237,24 +175,24 @@
                 <div class="credit-box">
                     <div class="avatar">B.</div>
                     <h4>Mukhamad Bayu Aji Tolafudin (Bhe)</h4>
-                    <p class="subtitle">Pengembang Aplikasi & Desain UI/UX<br>Mahasiswa PBSI - Universitas Tidar</p>
+                    <p class="subtitle">Desainer UI/UX & Pengembang Aplikasi Edukasi<br>Mahasiswa Pendidikan Bahasa dan Sastra Indonesia (PBSI)<br>Universitas Tidar</p>
                     
-                    <div class="divider"></div>
-                    
-                    <h4>Didukung Oleh</h4>
-                    <p class="subtitle" style="margin-bottom: 0;"><strong>Cendekia Aksara</strong><br>Komunitas Edukasi & Literasi</p>
+                    <div class="org-badge">
+                        <i class="fa-solid fa-feather-pointed"></i> Cendekia Aksara
+                    </div>
                 </div>
 
-                <div class="credit-box" style="background: #fffcf5; border-color: #ffecb3;">
-                    <h4 style="font-size: 14px; margin-bottom: 10px;">Teknologi yang Digunakan</h4>
+                <div class="tech-box">
+                    <h4 style="font-size: 14px; color: #334155;">Dibangun Menggunakan</h4>
                     <div class="tech-list">
-                        <span class="tech-badge">HTML5 / CSS3</span>
-                        <span class="tech-badge">Vanilla JavaScript</span>
-                        <span class="tech-badge">Google Firebase</span>
-                        <span class="tech-badge">Vercel Serverless</span>
-                        <span class="tech-badge">Google Gemini AI</span>
-                        <span class="tech-badge">ImgBB API</span>
-                        <span class="tech-badge">FontAwesome</span>
+                        <span class="tech-badge">HTML5 Modern</span>
+                        <span class="tech-badge">CSS3 Glassmorphism</span>
+                        <span class="tech-badge">Vanilla ES6 JavaScript</span>
+                        <span class="tech-badge">Google Firebase (Firestore)</span>
+                        <span class="tech-badge">Vercel Serverless API</span>
+                        <span class="tech-badge">Google Gemini AI Engine</span>
+                        <span class="tech-badge">Web Speech API</span>
+                        <span class="tech-badge">Canvas Confetti</span>
                     </div>
                 </div>
 
@@ -265,19 +203,23 @@
 
     <script>
         function switchTab(tabName) {
-            // Sembunyikan semua konten
+            // Hilangkan semua kelas aktif
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            // Hapus gaya aktif dari semua tombol
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-            // Tampilkan konten yang dipilih
+            // Tambahkan kelas aktif pada tab yang dituju
             document.getElementById(`tab-${tabName}`).classList.add('active');
             
-            // Tambahkan gaya aktif pada tombol yang ditekan
-            if(tabName === 'privasi') {
+            // Perbarui gaya tombol
+            if(tabName === 'aturan') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+            
+            // Berikan feedback getar jika didukung
+            if ("vibrate" in navigator) {
+                navigator.vibrate(50);
             }
         }
     </script>
