@@ -40,7 +40,7 @@
             background: rgba(255, 255, 255, 0.6); padding: 15px 20px; display: flex; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4); position: sticky; top: 0; z-index: 20;
         }
-        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; transition: 0.3s;}
+        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; transition: 0.3s; cursor: pointer;}
         .btn-back:hover { color: #10b981; transform: translateX(-3px); }
         .header-title { font-weight: 700; font-size: 16px; color: #059669; flex-grow: 1; }
 
@@ -62,7 +62,7 @@
         /* TOMBOL AUDIO (DENGARKAN) */
         .audio-bar {
             padding: 0 20px; margin-top: -20px; position: relative; z-index: 5;
-            display: none; /* Disembunyikan saat loading */
+            display: none; 
         }
         .btn-audio {
             width: 100%; background: #fff; border: 2px solid #fff;
@@ -88,7 +88,6 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Desain Tipografi Teks AI */
         .materi-box h3 {
             color: #059669; font-size: 18px; font-weight: 800;
             margin-top: 25px; margin-bottom: 12px;
@@ -101,9 +100,7 @@
         .materi-box h3:first-child { margin-top: 0; }
         .materi-box p { margin-bottom: 15px; text-align: justify; }
         .materi-box ul, .materi-box ol { margin-bottom: 15px; padding-left: 10px; list-style: none;}
-        .materi-box li {
-            margin-bottom: 10px; position: relative; padding-left: 20px;
-        }
+        .materi-box li { margin-bottom: 10px; position: relative; padding-left: 20px; }
         .materi-box li::before {
             content: "\f058"; font-family: "Font Awesome 6 Free"; font-weight: 900;
             position: absolute; left: 0; top: 2px; color: #10b981; font-size: 12px;
@@ -129,6 +126,25 @@
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* PESAN ERROR & TOMBOL RETRY */
+        .error-state {
+            display: none; flex-direction: column; align-items: center;
+            background: #fff; padding: 30px 20px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.1);
+            border: 2px dashed #fecaca;
+        }
+        .error-state i { font-size: 50px; color: #ef4444; margin-bottom: 15px; }
+        .error-state h4 { color: #1e293b; font-size: 16px; margin-bottom: 5px; font-weight: 800;}
+        .error-state p { color: #64748b; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+        
+        .btn-retry {
+            background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
+            border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700;
+            font-size: 14px; cursor: pointer; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+            transition: 0.3s;
+        }
+        .btn-retry:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4); }
+
         /* FOOTER PATEN */
         .footer-area {
             background: rgba(255, 255, 255, 0.5); text-align: center; padding: 20px;
@@ -143,7 +159,7 @@
 
     <div class="app-container">
         <header>
-            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <a onclick="history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
             <div class="header-title">Perpustakaan Materi</div>
         </header>
 
@@ -166,6 +182,13 @@
                     <i class="fa-solid fa-book-open-reader spinner-icon"></i>
                 </div>
                 <div id="loadingText">Guru sedang menyiapkan catatan terbaik untukmu...</div>
+            </div>
+
+            <div class="error-state" id="errorState">
+                <i class="fa-solid fa-wifi"></i>
+                <h4>Guru Sedang Sibuk!</h4>
+                <p>Gagal menghubungi server untuk menyusun materi. Coba periksa koneksi internetmu.</p>
+                <button class="btn-retry" onclick="fetchMateriAPI()"><i class="fa-solid fa-rotate-right"></i> Coba Panggil Guru Lagi</button>
             </div>
 
             <div class="materi-box" id="materiContent" style="display: none;"></div>
@@ -194,17 +217,23 @@
 
         async function fetchMateriAPI() {
             const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
             const materiContent = document.getElementById('materiContent');
             const audioBar = document.getElementById('audioBar');
             
-            // Konfigurasi Prompt
+            // Reset Tampilan
+            loadingState.style.display = 'flex';
+            errorState.style.display = 'none';
+            materiContent.style.display = 'none';
+            audioBar.style.display = 'none';
+            
             const payload = {
                 topikMateri: "Pengertian, Tujuan, Struktur (Abstraksi, Orientasi, Krisis, Reaksi, Koda), dan Kaidah Kebahasaan Teks Anekdot.",
                 instruksiKhusus: "Gunakan bahasa yang santai, mudah dipahami anak SMA kelas 10, dan berikan satu contoh analogi sederhana. Gunakan tag HTML h3, p, ul, li."
             };
 
             try {
-                // MENGHUBUNGI VERCEL API
+                // MENGHUBUNGI VERCEL API SECARA PAKSA (Tidak ada fallback offline)
                 const response = await fetch('/api/materi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -214,45 +243,19 @@
                 if (!response.ok) throw new Error('API Error');
 
                 const data = await response.json();
-                tampilkanData(data.kontenHtml);
+                
+                // Jika Berhasil: Tampilkan Materi dan Audio
+                loadingState.style.display = 'none';
+                materiContent.innerHTML = data.kontenHtml;
+                materiContent.style.display = 'block';
+                audioBar.style.display = 'block';
 
             } catch (error) {
-                console.warn('API belum terhubung ke Vercel. Memuat materi premium offline...');
+                console.error('Koneksi ke API Vercel/Gemini gagal:', error);
                 
-                // FALLBACK MATERI (Tetap ditampilkan jika API Vercel belum berjalan)
-                setTimeout(() => {
-                    const fallbackHTML = `
-                        <h3>Apa itu Teks Anekdot?</h3>
-                        <p>Bayangkan kamu lagi ngopi terus ada temanmu cerita pengalaman apesnya yang super lucu, tapi ujung-ujungnya dia nyindir keadaan sosial. Nah, itulah Anekdot! Teks anekdot adalah cerita singkat yang mengesankan dan lucu, biasanya soal orang penting, yang fungsinya untuk <strong>mengkritik secara halus</strong>.</p>
-                        
-                        <h3>Struktur Pembangun</h3>
-                        <p>Cerita anekdot yang bagus itu ada alurnya, nggak asal nyerocos. Ini dia 5 strukturnya:</p>
-                        <ul>
-                            <li><strong>Abstraksi:</strong> Pemanasan. Ngasih gambaran awal cerita ini tentang apa.</li>
-                            <li><strong>Orientasi:</strong> Mulai masuk ke latar belakang. Kenapa masalah ini bisa terjadi?</li>
-                            <li><strong>Krisis:</strong> Ini gong-nya! Bagian paling unik, aneh, atau lucu dari cerita.</li>
-                            <li><strong>Reaksi:</strong> Cara tokoh dalam cerita ngerespons si "krisis" tadi. Biasanya di sinilah letak tawanya.</li>
-                            <li><strong>Koda:</strong> Penutup. Pesan moral atau kondisi akhir ceritanya.</li>
-                        </ul>
-
-                        <h3>Ciri Kebahasaan</h3>
-                        <p>Kalau kamu baca teks, kamu bisa tahu itu anekdot dari ciri-cirinya:</p>
-                        <ul>
-                            <li>Pakai keterangan waktu masa lalu (contoh: <em>Zaman dahulu...</em>).</li>
-                            <li>Pakai pertanyaan retoris (pertanyaan yang nggak butuh dijawab).</li>
-                            <li>Pakai kata kerja aksi (contoh: <em>berjalan, memukul</em>).</li>
-                            <li>Alurnya urut pakai konjungsi waktu (<em>kemudian, lalu</em>).</li>
-                        </ul>
-                    `;
-                    tampilkanData(fallbackHTML);
-                }, 2000); // Simulasi waktu guru menyiapkan materi
-            }
-
-            function tampilkanData(htmlString) {
+                // Jika Gagal: Tampilkan Kotak Error dan Tombol Retry
                 loadingState.style.display = 'none';
-                materiContent.innerHTML = htmlString;
-                materiContent.style.display = 'block';
-                audioBar.style.display = 'block'; // Tampilkan tombol audio
+                errorState.style.display = 'flex';
             }
         }
 
@@ -267,23 +270,18 @@
 
         btnPlayAudio.addEventListener('click', () => {
             if (isPlaying) {
-                // Jika sedang bermain, matikan
                 synth.cancel();
                 isPlaying = false;
                 resetTombolAudio();
             } else {
-                // Ambil teks murni (tanpa tag HTML) dari kotak materi
                 const rawText = document.getElementById('materiContent').innerText;
-                
-                // Pastikan tidak ada suara yang numpuk
                 synth.cancel(); 
 
                 const utterance = new SpeechSynthesisUtterance(rawText);
-                utterance.lang = 'id-ID'; // Bahasa Indonesia
-                utterance.rate = 0.9;     // Kecepatan membaca agak lambat biar jelas
-                utterance.pitch = 1;      // Nada normal
+                utterance.lang = 'id-ID'; 
+                utterance.rate = 0.9;     
+                utterance.pitch = 1;      
 
-                // Ubah UI Tombol
                 btnPlayAudio.classList.add('playing');
                 iconAudio.className = 'fa-solid fa-circle-stop';
                 textAudio.textContent = 'Hentikan Suara';
@@ -291,7 +289,6 @@
 
                 synth.speak(utterance);
 
-                // Kembalikan tombol ke semula jika sudah selesai dibaca
                 utterance.onend = () => {
                     isPlaying = false;
                     resetTombolAudio();
@@ -305,7 +302,6 @@
             textAudio.textContent = 'Dengarkan Materi';
         }
 
-        // Matikan suara kalau pengguna pindah halaman (tekan tombol back)
         window.addEventListener('beforeunload', () => {
             if (synth) synth.cancel();
         });
