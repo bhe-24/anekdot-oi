@@ -13,7 +13,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        /* Latar Belakang Pastel Animasi Tipis */
         body { 
             background: linear-gradient(-45deg, #fce4ec, #f8bbd0, #ffecd2, #e0f2fe);
             background-size: 400% 400%;
@@ -28,7 +27,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Container ala Glassmorphism */
         .app-container {
             width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
             background: rgba(255, 255, 255, 0.75);
@@ -37,7 +35,6 @@
             position: relative; display: flex; flex-direction: column; overflow-x: hidden;
         }
 
-        /* HEADER */
         header {
             background: rgba(255, 255, 255, 0.6); padding: 15px 20px; display: flex; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.3); position: sticky; top: 0; z-index: 10;
@@ -51,7 +48,6 @@
             display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
         }
 
-        /* INTRO */
         .intro-section { padding: 15px 20px; }
         .intro-box {
             background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.5); 
@@ -67,26 +63,30 @@
         }
         .intro-text { font-size: 13px; color: #444; line-height: 1.6; font-weight: 500; }
 
-        .challenge-area { padding: 0 20px 30px; display: none; flex-direction: column; gap: 15px; align-items: center; flex-grow: 1;}
+        .challenge-area { padding: 0 20px 30px; display: none; flex-direction: column; align-items: center; flex-grow: 1;}
 
-        /* KARTU CHALLENGE PORTRAIT MODERN */
+        /* KARTU GAMBAR BERDIRI SENDIRI */
         .challenge-card {
-            width: 100%; max-width: 280px; min-height: 380px;
+            width: 100%; max-width: 280px; height: 280px;
             background: #fff; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(216, 27, 96, 0.1);
+            box-shadow: 0 15px 35px rgba(216, 27, 96, 0.15);
             overflow: hidden; border: 3px solid #fff; margin: 10px 0 20px;
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            transition: transform 0.3s ease; flex-shrink: 0;
         }
-        .challenge-card:hover { transform: translateY(-5px); }
+        .challenge-card:hover { transform: translateY(-5px) scale(1.02); }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .card-img { width: 100%; height: 200px; object-fit: cover; background: #fce4ec; border-bottom: 2px solid #f8bbd0;}
-        .card-content { padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; background: #fff;}
+        /* KOTAK TEMA & KATA KUNCI TERPISAH */
+        .theme-box {
+            width: 100%; background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(255,255,255,0.6); 
+            border-radius: 15px; padding: 15px; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03); margin-bottom: 20px;
+        }
         .challenge-title { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px;}
-        .challenge-tema { font-size: 16px; color: #d81b60; margin-bottom: 12px; font-weight: 800; display: block;}
-        .keyword-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-        .keyword-badge { background: linear-gradient(135deg, #d81b60, #ec4899); color: white; padding: 4px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 5px rgba(216, 27, 96, 0.2);}
+        .challenge-tema { font-size: 16px; color: #d81b60; margin: 5px 0 12px; font-weight: 800; display: block;}
+        .keyword-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .keyword-badge { background: linear-gradient(135deg, #d81b60, #ec4899); color: white; padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 5px rgba(216, 27, 96, 0.2);}
 
-        /* AREA PENULISAN */
         .textarea-container { width: 100%; transition: all 0.3s; }
         .input-anekdot {
             width: 100%; min-height: 160px; padding: 15px; border: 2px solid rgba(226, 232, 240, 0.8);
@@ -104,12 +104,10 @@
         }
         .btn-kirim:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(216, 27, 96, 0.4); }
 
-        /* STATUS AI */
         .ai-status { text-align: center; padding: 20px 0; display: none; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #d81b60;}
         .spinner { width: 35px; height: 35px; border: 4px solid #fce4ec; border-top: 4px solid #d81b60; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* KOTAK HASIL */
         .result-box {
             display: none; background: rgba(255, 255, 255, 0.95); border: 2px solid #10b981;
             border-radius: 15px; padding: 20px; margin-top: 15px; width: 100%;
@@ -126,24 +124,33 @@
         }
         .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
 
-        /* FOOTER PATEN */
         .footer-area {
             background: rgba(255, 255, 255, 0.5); text-align: center; padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.4); margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.4); margin-top: auto; width: 100%;
         }
         .footer-links a { color: #64748b; text-decoration: none; font-size: 12px; font-weight: 600; margin: 0 10px; transition: 0.2s; }
         .footer-links a:hover { color: #d81b60; }
         .copyright { font-size: 11px; color: #94a3b8; margin-top: 5px;}
 
-        /* MODAL */
+        /* MODAL KHUSUS (Trophy Selesai & Peringatan Error) */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
             display: none; align-items: center; justify-content: center; z-index: 2000;
         }
         .modal-box { background: #fff; padding: 30px; border-radius: 25px; max-width: 320px; width: 90%; text-align: center; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal-box i { font-size: 60px; color: #d81b60; margin-bottom: 15px; }
-        .btn-modal { background: #d81b60; color: #fff; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 700; margin-top: 20px; width: 100%; cursor: pointer;}
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-icon { font-size: 60px; margin-bottom: 15px; }
+        .icon-success { color: #ffb300; }
+        .icon-error { color: #ef4444; }
+
+        .modal-title { font-weight: 700; font-size: 18px; margin-bottom: 8px; color: #1e293b;}
+        .modal-desc { font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 20px;}
+        
+        .btn-modal { border: none; padding: 12px 30px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer;}
+        .btn-modal-primary { background: #d81b60; color: #fff; }
+        .btn-modal-error { background: #ef4444; color: #fff; }
 
         .loading-data { text-align: center; padding: 100px 20px; color: #d81b60; font-weight: 600;}
     </style>
@@ -174,11 +181,12 @@
         <section class="challenge-area" id="challengeArea">
             <div class="challenge-card">
                 <img src="" id="imgChallenge" class="card-img" alt="Tema">
-                <div class="card-content">
-                    <div class="challenge-title">Tema Cerita</div>
-                    <strong id="temaTantangan" class="challenge-tema"></strong>
-                    <div class="keyword-container" id="areaKataKunci"></div>
-                </div>
+            </div>
+
+            <div class="theme-box">
+                <div class="challenge-title">Tema Cerita:</div>
+                <strong id="temaTantangan" class="challenge-tema"></strong>
+                <div class="keyword-container" id="areaKataKunci"></div>
             </div>
 
             <div class="textarea-container" id="formArea">
@@ -213,10 +221,10 @@
 
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
-            <i class="fa-solid fa-medal"></i>
-            <h3>Keren Banget!</h3>
-            <p style="font-size: 13px; color: #666;">Semua ide cerita sudah kamu selesaikan. Mau kita acak dari awal lagi?</p>
-            <button class="btn-modal" id="btnTutupModal">Sikat!</button>
+            <i class="fa-solid fa-medal modal-icon icon-success" id="modalIcon"></i>
+            <h3 class="modal-title" id="modalTitle">Judul</h3>
+            <p class="modal-desc" id="modalDesc">Deskripsi.</p>
+            <button class="btn-modal btn-modal-primary" id="btnTutupModal">OK</button>
         </div>
     </div>
 
@@ -253,8 +261,32 @@
         const resultBox = document.getElementById('resultBox');
         const btnNext = document.getElementById('btnNext');
         const skorElement = document.getElementById('skorUser');
-        const modalOverlay = document.getElementById('modalOverlay');
         const soundMenang = document.getElementById('soundMenang');
+
+        // Elemen Modal Custom
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const btnTutupModal = document.getElementById('btnTutupModal');
+
+        // Fungsi Memanggil Modal Custom
+        function tampilkanModal(tipe, judul, deskripsi, teksTombol) {
+            if (tipe === 'error') {
+                modalIcon.className = "fa-solid fa-triangle-exclamation modal-icon icon-error";
+                btnTutupModal.className = "btn-modal btn-modal-error";
+                if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]); // Getar jika error
+            } else {
+                modalIcon.className = "fa-solid fa-medal modal-icon icon-success";
+                btnTutupModal.className = "btn-modal btn-modal-primary";
+            }
+            
+            modalTitle.textContent = judul;
+            modalDesc.textContent = deskripsi;
+            btnTutupModal.textContent = teksTombol;
+            
+            modalOverlay.style.display = 'flex';
+        }
 
         async function init() {
             if (!userID) { window.location.href = 'index.html'; return; }
@@ -284,7 +316,8 @@
 
         function tampilkanChallengeBaru() {
             if (challengeTersedia.length === 0) {
-                modalOverlay.style.display = 'flex';
+                // Munculkan Modal Selesai
+                tampilkanModal('success', 'Keren Banget!', 'Semua ide cerita sudah kamu selesaikan. Mau kita acak dari awal lagi?', 'Sikat!');
                 challengeTersedia = [...bankChallenge];
                 return;
             }
@@ -293,9 +326,11 @@
             challengeSaatIni = challengeTersedia[idx];
             challengeTersedia.splice(idx, 1);
 
+            // Pasang Gambar
             document.getElementById('imgChallenge').src = challengeSaatIni.img;
-            document.getElementById('temaTantangan').textContent = challengeSaatIni.tema;
             
+            // Pasang Tema & Kata Kunci di Kotak Bawah
+            document.getElementById('temaTantangan').textContent = challengeSaatIni.tema;
             const areaKata = document.getElementById('areaKataKunci');
             areaKata.innerHTML = '';
             challengeSaatIni.kataKunci.forEach(kata => {
@@ -305,7 +340,7 @@
                 areaKata.appendChild(span);
             });
 
-            // Reset Form (Buka kunci text area dan sembunyikan hasil)
+            // Reset Form Area
             inputAnekdot.value = '';
             inputAnekdot.readOnly = false;
             btnKirim.style.display = 'block';
@@ -317,11 +352,12 @@
         btnKirim.onclick = async () => {
             const teks = inputAnekdot.value.trim();
             if (teks.length < 20) {
-                alert("Teks kependekan, Bhe! Minimal 20 karakter biar ceritanya lebih berasa.");
+                // Gunakan Custom Modal untuk Peringatan Teks Pendek
+                tampilkanModal('error', 'Teks Terlalu Pendek!', 'Ayo, Bhe! Minimal 20 karakter biar ceritanya lebih berasa dan bisa dinilai AI.', 'Siap, Aku Tambahin!');
                 return;
             }
 
-            // Kunci Text Area agar siswa tidak mengubahnya lagi
+            // Kunci Text Area
             inputAnekdot.readOnly = true;
             btnKirim.style.display = 'none';
             aiLoading.style.display = 'flex';
@@ -366,15 +402,21 @@
             } catch (e) {
                 aiLoading.style.display = 'none';
                 btnKirim.style.display = 'block';
-                inputAnekdot.readOnly = false; // Buka kunci jika error
-                alert("Gagal menghubungi Guru AI. Pastikan internet aktif atau server sudah siap.");
+                inputAnekdot.readOnly = false; 
+                
+                // Gunakan Custom Modal untuk Peringatan Koneksi
+                tampilkanModal('error', 'Aduh, Gagal Konek!', 'Gagal menghubungi Guru AI. Pastikan internetmu aktif atau server API sudah siap.', 'Tutup');
             }
         };
 
         btnNext.onclick = tampilkanChallengeBaru;
-        document.getElementById('btnTutupModal').onclick = () => {
+        
+        btnTutupModal.onclick = () => {
             modalOverlay.style.display = 'none';
-            tampilkanChallengeBaru();
+            // Jika modal yang ditutup adalah modal 'success' (Trophy), panggil tantangan baru
+            if (modalIcon.classList.contains('icon-success')) {
+                tampilkanChallengeBaru();
+            }
         };
 
         init();
