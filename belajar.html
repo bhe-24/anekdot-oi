@@ -7,103 +7,158 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        body { background: #f0f4f8; color: #333; min-height: 100vh; }
+        body { background: #f4f7f9; color: #333; min-height: 100vh; }
 
         .app-container {
             width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
-            background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            position: relative; display: flex; flex-direction: column;
+            background: #fff; box-shadow: 0 0 25px rgba(0,0,0,0.08);
+            position: relative; display: flex; flex-direction: column; overflow-x: hidden;
         }
 
+        /* HEADER */
         header {
             background: #fff; padding: 15px 20px; display: flex; align-items: center;
             border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;
         }
-
-        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; }
-        .header-title { font-weight: 600; font-size: 16px; color: #2575fc; flex-grow: 1; }
+        .btn-back { color: #555; font-size: 20px; text-decoration: none; margin-right: 15px; transition: 0.3s;}
+        .btn-back:hover { color: #2575fc; transform: translateX(-3px); }
+        .header-title { font-weight: 700; font-size: 16px; color: #2575fc; flex-grow: 1; }
         .poin-badge {
-            background: #ffb300; color: #fff; padding: 5px 12px;
-            border-radius: 20px; font-size: 12px; font-weight: 700;
-            display: flex; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, #ffb300, #f59e0b); color: #fff; padding: 6px 15px;
+            border-radius: 20px; font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
         }
 
-        .intro-section { padding: 20px; background: linear-gradient(to bottom, #f8faff, #fff); }
+        /* MATERI BERJALAN (TYPEWRITER) */
+        .intro-section { padding: 15px 20px; background: #fff; }
+        .intro-box {
+            background: #f8fbff; border: 1px solid #e3f2fd; border-radius: 15px;
+            padding: 15px; position: relative; min-height: 90px;
+            display: flex; align-items: center;
+        }
+        .intro-box::before {
+            content: "\f0eb"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; top: -10px; left: 15px; background: #2575fc; color: #fff;
+            width: 24px; height: 24px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 12px;
+        }
         .intro-text {
-            font-size: 13px; color: #444; line-height: 1.6; margin-bottom: 10px;
-            padding: 15px; background: #e3f2fd; border-radius: 12px;
-            border-left: 4px solid #2575fc;
+            font-size: 13px; color: #444; line-height: 1.6; font-weight: 500;
         }
-        .action-call { text-align: center; font-weight: 600; color: #2575fc; font-size: 14px; font-style: italic; }
+        .cursor { display: inline-block; width: 3px; background-color: #2575fc; animation: blink 1s infinite; margin-left: 2px;}
+        @keyframes blink { 50% { opacity: 0; } }
 
-        /* KARTU PORTRAIT */
-        .game-area { padding: 0 20px 30px; display: none; flex-direction: column; align-items: center; }
+        /* BANNER HUMOR BERGERAK */
+        .humor-banner {
+            width: 100%; padding: 10px 0; color: white; font-weight: 600; font-size: 13px;
+            background: linear-gradient(-45deg, #ff4757, #ff6b81, #2575fc, #6a11cb);
+            background-size: 400% 400%; animation: gradientBG 5s ease infinite;
+            overflow: hidden; position: relative; white-space: nowrap; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .humor-text {
+            display: inline-block; animation: marquee 10s linear infinite;
+        }
+        @keyframes marquee { 0% { transform: translateX(100vw); } 100% { transform: translateX(-150%); } }
+
+        /* AREA GAME */
+        .game-area { padding: 20px; display: none; flex-direction: column; align-items: center; flex-grow: 1; }
+
+        /* KARTU FULL GAMBAR (PREMIUM 3D FLIP) */
         .card-container {
-            width: 100%; max-width: 280px; height: 400px; 
-            perspective: 1000px; margin: 20px auto;
+            width: 100%; max-width: 260px; height: 380px; 
+            perspective: 1500px; margin: 0 auto 20px;
         }
-
         .card-inner {
             width: 100%; height: 100%; position: relative;
-            transition: transform 0.8s; transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animasi membal elegan */
+            transform-style: preserve-3d;
         }
-        .card-inner.is-flipped { transform: rotateY(180deg); }
+        .card-container:hover .card-inner:not(.is-flipped) {
+            transform: scale(1.02) translateY(-5px); /* Sedikit naik saat disentuh */
+        }
+        .card-inner.is-flipped { transform: rotateY(180deg) scale(1); }
 
         .card-front, .card-back {
             width: 100%; height: 100%; position: absolute;
             backface-visibility: hidden; border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden;
-            display: flex; flex-direction: column; background: #fff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); overflow: hidden;
+            background: #fff; border: 3px solid #fff;
         }
-        .card-back { transform: rotateY(180deg); background: #f0fff4; border: 2px solid #4caf50; }
+        .card-back { transform: rotateY(180deg); border-color: #4caf50; }
 
-        .card-img { width: 100%; height: 60%; object-fit: cover; background: #f9f9f9; }
-        .card-question {
-            padding: 15px; text-align: center; font-size: 14px;
-            font-weight: 600; color: #333; flex-grow: 1;
-            display: flex; align-items: center; justify-content: center;
+        /* Gambar full 100% */
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* KOTAK PERTANYAAN DI BAWAH KARTU */
+        .question-box {
+            background: #fff; border: 2px solid #edf2f7; border-radius: 15px;
+            padding: 15px; text-align: center; font-size: 14px; font-weight: 600;
+            color: #333; margin-bottom: 20px; width: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03); line-height: 1.5;
         }
 
+        /* INPUT & TOMBOL MODERN */
         .input-area { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .input-jawab {
-            width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 12px;
+            width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 15px;
             font-size: 16px; text-align: center; outline: none; text-transform: uppercase; 
+            transition: all 0.3s ease; font-weight: 600; color: #1e293b; background: #f8fafc;
         }
+        .input-jawab:focus { border-color: #2575fc; background: #fff; box-shadow: 0 0 0 4px rgba(37, 117, 252, 0.1); }
         .btn-kirim {
-            width: 100%; padding: 14px; background: #2575fc; color: white;
-            border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #2575fc, #3b82f6);
+            color: white; border: none; border-radius: 15px; font-size: 16px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 8px 20px rgba(37, 117, 252, 0.3); transition: 0.3s;
         }
+        .btn-kirim:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 117, 252, 0.4); }
 
-        .feedback-msg { text-align: center; font-size: 13px; font-weight: 600; margin-top: 10px; min-height: 20px;}
-        .msg-error { color: #f44336; }
-        .msg-success { color: #4caf50; }
+        .feedback-msg { text-align: center; font-size: 14px; font-weight: 700; margin-top: 10px; min-height: 20px;}
+        .msg-error { color: #ef4444; animation: shake 0.4s; display: inline-block;}
+        .msg-success { color: #10b981; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
 
-        .extra-controls { display: none; width: 100%; gap: 10px; margin-top: 15px; }
-        .btn-outline, .btn-next { flex: 1; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; }
-        .btn-outline { background: transparent; border: 2px solid #2575fc; color: #2575fc; }
-        .btn-next { background: #4caf50; border: none; color: white; }
+        .extra-controls { display: none; width: 100%; gap: 12px; margin-top: 15px; }
+        .btn-outline, .btn-next { flex: 1; padding: 14px; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s;}
+        .btn-outline { background: #fff; border: 2px solid #cbd5e1; color: #64748b; }
+        .btn-outline:hover { border-color: #94a3b8; color: #334155; }
+        .btn-next { background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+
+        /* FOOTER PATEN */
+        .footer-area {
+            background: #f8fafc; text-align: center; padding: 20px;
+            border-top: 1px solid #e2e8f0; margin-top: auto;
+        }
+        .footer-links a { color: #64748b; text-decoration: none; font-size: 12px; font-weight: 600; margin: 0 10px; transition: 0.2s; }
+        .footer-links a:hover { color: #2575fc; }
+        .copyright { font-size: 11px; color: #94a3b8; margin-top: 5px;}
 
         /* MODAL */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; align-items: center;
-            justify-content: center; z-index: 2000;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
         }
         .modal-box {
-            background: #fff; padding: 30px; border-radius: 20px;
+            background: #fff; padding: 30px; border-radius: 25px;
             max-width: 320px; width: 90%; text-align: center;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .modal-box i { font-size: 50px; color: #ffb300; margin-bottom: 15px; }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-box i { font-size: 60px; color: #ffb300; margin-bottom: 15px; }
         .btn-modal {
-            background: #2575fc; color: #fff; border: none; padding: 10px 30px;
-            border-radius: 10px; font-weight: 600; margin-top: 20px;
+            background: #2575fc; color: #fff; border: none; padding: 14px 30px;
+            border-radius: 15px; font-weight: 700; margin-top: 20px; cursor: pointer; width: 100%;
         }
 
-        .loading-data { text-align: center; padding: 100px 20px; color: #2575fc; }
+        .loading-data { text-align: center; padding: 100px 20px; color: #2575fc; font-weight: 600;}
     </style>
 </head>
 <body>
@@ -118,14 +173,17 @@
         </header>
 
         <section class="intro-section">
-            <div class="intro-text">
-                <strong>Teks Anekdot</strong> adalah cerita singkat yang lucu untuk menyindir atau mengkritik sesuatu.
+            <div class="intro-box">
+                <div class="intro-text"><span id="materiText"></span><span class="cursor"></span></div>
             </div>
-            <div class="action-call">Dijawab yang bener ya, jangan asal-asalan!</div>
         </section>
 
+        <div class="humor-banner">
+            <div class="humor-text" id="humorText">Ayo jawab dengan benar, jangan sampai otakmu ikutan nge-blank!</div>
+        </div>
+
         <div class="loading-data" id="loadingData">
-            <i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Menyiapkan kartu...
+            <i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Menarik kartu dari server...
         </div>
 
         <section class="game-area" id="gameArea">
@@ -133,37 +191,47 @@
                 <div class="card-inner" id="flashcard">
                     <div class="card-front">
                         <img src="" id="imgDepan" class="card-img" alt="Soal">
-                        <div class="card-question" id="teksSoal"></div>
                     </div>
                     <div class="card-back">
                         <img src="" id="imgBelakang" class="card-img" alt="Jawaban">
-                        <div class="card-question" style="color: #2e7d32;">
-                            Jawaban: <br><strong id="teksJawabanBenar"></strong>
-                        </div>
                     </div>
                 </div>
             </div>
 
+            <div class="question-box" id="teksSoal">Memuat soal...</div>
+
             <div class="input-area" id="areaInput">
-                <input type="text" id="inputJawab" class="input-jawab" placeholder="Jawab di sini..." autocomplete="off">
-                <button class="btn-kirim" id="btnKirim">Kirim Jawaban</button>
+                <input type="text" id="inputJawab" class="input-jawab" placeholder="Ketik jawaban di sini..." autocomplete="off">
+                <button class="btn-kirim" id="btnKirim">Kunci Jawaban</button>
             </div>
+            
             <div class="feedback-msg" id="pesanFeedback"></div>
+            
             <div class="extra-controls" id="areaKontrolLanjut">
-                <button class="btn-outline" id="btnBalikKartu">Cek Soal</button>
+                <button class="btn-outline" id="btnBalikKartu"><i class="fa-solid fa-rotate"></i> Putar Kartu</button>
                 <button class="btn-next" id="btnNext">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </section>
+
+        <div class="footer-area">
+            <div class="footer-links">
+                <a href="privasi.html">Kebijakan Privasi</a> •
+                <a href="privasi.html">Kredit</a>
+            </div>
+            <div class="copyright">© 2026 Anekdot.io by Cendekia Aksara</div>
+        </div>
     </div>
 
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <i class="fa-solid fa-trophy"></i>
-            <h3>Hebat!</h3>
-            <p>Semua kartu sudah kamu babat habis. Kita putar lagi dari awal ya!</p>
-            <button class="btn-modal" id="btnTutupModal">Oke, Gas!</button>
+            <h3 style="margin-bottom: 5px;">Luar Biasa!</h3>
+            <p style="font-size: 13px; color:#666;">Semua tumpukan kartu sudah kamu selesaikan. Mau kita acak lagi dari awal?</p>
+            <button class="btn-modal" id="btnTutupModal">Main Lagi!</button>
         </div>
     </div>
+
+    <audio id="soundBenar" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -181,6 +249,29 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // VARIABEL MATERI (10 Paragraf)
+        const materiArray = [
+            "Teks anekdot adalah cerita singkat yang menarik karena lucu dan mengesankan.",
+            "Biasanya anekdot menceritakan orang penting atau figur publik berdasarkan kejadian nyata.",
+            "Tujuan utama teks anekdot bukanlah sekadar hiburan, melainkan untuk menyindir atau mengkritik.",
+            "Struktur pertama adalah Abstraksi, yaitu bagian awal yang memberikan gambaran umum cerita.",
+            "Kedua, Orientasi. Bagian ini menunjukkan latar belakang bagaimana peristiwa utama terjadi.",
+            "Ketiga, Krisis. Ini adalah inti cerita tempat terjadinya hal unik atau masalah yang menggelitik.",
+            "Keempat, Reaksi. Bagian yang berisi tanggapan atau respons atas krisis yang terjadi sebelumnya.",
+            "Kelima, Koda. Merupakan penutup atau kesimpulan dari cerita anekdot.",
+            "Anekdot sering menggunakan pertanyaan retoris, yaitu pertanyaan yang tidak membutuhkan jawaban.",
+            "Anekdot juga banyak menggunakan kata kerja aksi dan konjungsi yang menyatakan urutan waktu."
+        ];
+
+        // VARIABEL HUMOR BANNER
+        const humorArray = [
+            "Ayo fokus! Jangan sampai ingatanmu hilang kayak janji politisi pas kampanye.",
+            "Dijawab yang bener ya, masa kalah sama anak SD yang lagi ujian matematika?",
+            "Santai tapi pasti. Nggak usah buru-buru, yang penting poinnya masuk!",
+            "Kalau salah jangan nangis, cukup tarik napas dan coba lagi.",
+            "Ayo buktikan kamu lebih cerdas dari AI yang bikin sistem ini!"
+        ];
+
         let bankSoal = [];
         let soalTersedia = [];
         let soalSaatIni = null;
@@ -191,6 +282,7 @@
         const loadingData = document.getElementById('loadingData');
         const gameArea = document.getElementById('gameArea');
         const flashcard = document.getElementById('flashcard');
+        const teksSoal = document.getElementById('teksSoal');
         const inputJawab = document.getElementById('inputJawab');
         const btnKirim = document.getElementById('btnKirim');
         const pesanFeedback = document.getElementById('pesanFeedback');
@@ -198,18 +290,50 @@
         const areaKontrolLanjut = document.getElementById('areaKontrolLanjut');
         const skorElement = document.getElementById('skorUser');
         const modalOverlay = document.getElementById('modalOverlay');
+        const soundBenar = document.getElementById('soundBenar');
+
+        // FUNGSI ANIMASI TYPEWRITER MATERI
+        let materiIndex = 0;
+        let charIndex = 0;
+        let currentText = "";
+        const materiEl = document.getElementById('materiText');
+
+        function typeWriter() {
+            if (charIndex < materiArray[materiIndex].length) {
+                currentText += materiArray[materiIndex].charAt(charIndex);
+                materiEl.innerHTML = currentText;
+                charIndex++;
+                setTimeout(typeWriter, 50); // Kecepatan ngetik
+            } else {
+                setTimeout(hapusWriter, 8000); // Tunggu 8 detik sebelum ganti paragraf
+            }
+        }
+
+        function hapusWriter() {
+            materiIndex = (materiIndex + 1) % materiArray.length;
+            currentText = "";
+            charIndex = 0;
+            typeWriter();
+        }
+
+        // FUNGSI ROTASI HUMOR BANNER
+        let humorIndex = 0;
+        const humorEl = document.getElementById('humorText');
+        setInterval(() => {
+            humorIndex = (humorIndex + 1) % humorArray.length;
+            humorEl.textContent = humorArray[humorIndex];
+        }, 10000); // Ganti tiap 10 detik
 
         async function init() {
             if (!userID) { window.location.href = 'index.html'; return; }
             skorElement.textContent = skor;
+            typeWriter(); // Mulai animasi ketik
             
             try {
-                // Ambil User Ref
                 const qUser = query(collection(db, "users_session"), where("userID", "==", userID));
                 const userSnap = await getDocs(qUser);
                 if (!userSnap.empty) userDocRef = userSnap.docs[0].ref;
 
-                // Ambil Soal
                 const soalSnap = await getDocs(collection(db, "bank_soal_belajar"));
                 soalSnap.forEach(doc => bankSoal.push(doc.data()));
                 
@@ -238,17 +362,19 @@
             soalSaatIni = soalTersedia[idx];
             soalTersedia.splice(idx, 1);
 
+            // Tampilkan Gambar Full
             document.getElementById('imgDepan').src = soalSaatIni.imgDepan;
-            document.getElementById('teksSoal').textContent = soalSaatIni.pertanyaan;
             document.getElementById('imgBelakang').src = soalSaatIni.imgBelakang;
-            document.getElementById('teksJawabanBenar').textContent = soalSaatIni.jawaban;
+            
+            // Pertanyaan di kotak bawah
+            teksSoal.innerHTML = `<strong>Pertanyaan:</strong><br>${soalSaatIni.pertanyaan}`;
 
             flashcard.classList.remove('is-flipped');
             inputJawab.value = '';
             pesanFeedback.innerHTML = '';
             areaInput.style.display = 'flex';
             areaKontrolLanjut.style.display = 'none';
-            inputJawab.focus();
+            // inputJawab.focus(); // DIHILANGKAN agar keyboard tidak otomatis naik
         }
 
         btnKirim.onclick = async () => {
@@ -256,22 +382,37 @@
             const jAsli = soalSaatIni.jawaban.trim().toUpperCase();
 
             if (!jUser) { 
-                pesanFeedback.innerHTML = '<span class="msg-error">Diisi dulu, jangan dikosongin!</span>'; 
+                pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-triangle-exclamation"></i> Diisi dulu dong jawabannya!</span>'; 
                 return; 
             }
 
             if (jUser === jAsli) {
-                pesanFeedback.innerHTML = '<span class="msg-success">Mantap! Jawabanmu bener banget.</span>';
+                // JAWABAN BENAR
+                pesanFeedback.innerHTML = '<span class="msg-success"><i class="fa-solid fa-circle-check"></i> Luar Biasa! Jawaban Tepat.</span>';
+                
+                // MEMAINKAN SOUND & KONFETI
+                soundBenar.play();
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#2575fc', '#4caf50', '#ffb300', '#ff4757']
+                });
+
                 skor += 10;
                 skorElement.textContent = skor;
                 sessionStorage.setItem('skorLocal', skor);
                 if (userDocRef) updateDoc(userDocRef, { skor: skor });
 
+                // Ubah Teks Soal menjadi Teks Jawaban Benar
+                teksSoal.innerHTML = `<span style="color:#10b981;"><strong>Kunci Jawaban:</strong><br>${soalSaatIni.jawaban}</span>`;
+
                 flashcard.classList.add('is-flipped');
                 areaInput.style.display = 'none';
                 areaKontrolLanjut.style.display = 'flex';
             } else {
-                pesanFeedback.innerHTML = '<span class="msg-error">Yah, salah. Fokus dong, jangan asal!</span>';
+                // JAWABAN SALAH
+                pesanFeedback.innerHTML = '<span class="msg-error"><i class="fa-solid fa-xmark"></i> Kurang tepat. Coba cek lagi!</span>';
             }
         };
 
