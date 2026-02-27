@@ -57,7 +57,7 @@
         }
 
         .podium-item {
-            display: flex; flex-direction: column; align-items: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             width: 30%; position: relative;
         }
 
@@ -84,7 +84,9 @@
 
         /* Balok Podium */
         .podium-bar {
-            width: 100%; border-top-left-radius: 12px; border-top-right-radius: 12px;
+            width: 100%; 
+            height: 100%; /* INI YANG KEMARIN HILANG, SEKARANG SUDAH KEMBALI */
+            border-top-left-radius: 12px; border-top-right-radius: 12px;
             box-shadow: inset 0 5px 20px rgba(255,255,255,0.4), 0 5px 15px rgba(0,0,0,0.5);
             background-size: 200% 200%; animation: shimmer 3s ease infinite;
         }
