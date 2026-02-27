@@ -1,80 +1,69 @@
-// 1. TAMBAHKAN INI AGAR VERCEL TIDAK MEMUTUS PAKSA (TIMEOUT) DALAM 10 DETIK
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+// Tambahkan ini agar Vercel memberi waktu proses lebih lama (maksimal 60 detik)
 export const maxDuration = 60; 
 
-export default async function handler(req, res) {
-    // 2. Header CORS
+module.exports = async function handler(req, res) {
+    // Pengaturan CORS (Agar API bisa diakses dari frontend)
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
+    // Jika method OPTIONS (Preflight request dari browser)
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        res.status(200).end();
+        return;
     }
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Harus menggunakan metode POST.' });
+        return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    // 3. CEK API KEY
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'API_KEY_HILANG: Kamu belum memasukkan OPENROUTER_API_KEY di Vercel.' });
+    // Pastikan API Key ada
+    if (!process.env.GEMINI_API_KEY) {
+        return res.status(500).json({ error: 'GEMINI_API_KEY belum dipasang di Vercel.' });
     }
 
     try {
         const { topikMateri, instruksiKhusus } = req.body;
 
-        const promptSystem = `Kamu adalah guru bahasa Indonesia yang asyik untuk anak SMA kelas 10. 
-Buatlah materi pembelajaran dalam format HTML mentah. 
-HANYA gunakan tag <h3>, <p>, <ul>, <li>, <strong>, dan <em>. 
-JANGAN gunakan tag <html> atau <body>. 
-JANGAN membalas menggunakan markdown backtick (\`\`\`html).`;
+        if (!topikMateri) {
+            return res.status(400).json({ error: 'Topik materi tidak boleh kosong' });
+        }
 
-        const promptUser = `Buat materi Teks Anekdot tentang: "${topikMateri}". Arahan: "${instruksiKhusus || 'Santai'}".`;
+        // Inisialisasi Gemini dengan API Key
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        // Menggunakan model flash yang super cepat
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        // 4. MENGHUBUNGI OPENROUTER DENGAN MODEL SUPER CEPAT
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://anekdot-io.vercel.app", 
-                "X-Title": "Anekdot IO"
-            },
-            body: JSON.stringify({
-                // PENTING: Pakai model Gemini Flash yang cuma butuh 2-3 detik buat mikir!
-                "model": "google/gemini-2.5-flash:free", 
-                "messages": [
-                    { "role": "system", "content": promptSystem },
-                    { "role": "user", "content": promptUser }
-                ]
-            })
+        // Prompt khusus untuk menyusun materi
+        const promptSystem = `
+        Kamu adalah Guru Bahasa Indonesia yang asyik dan gaul untuk anak SMA kelas 10.
+        Buatlah materi pembelajaran tentang: "${topikMateri}".
+        Arahan tambahan: "${instruksiKhusus}".
+        
+        Wajib gunakan HANYA format HTML mentah (gunakan tag <h3>, <p>, <ul>, <li>, <strong>, <em>).
+        JANGAN gunakan tag <html>, <body>, atau markdown backtick (\`\`\`html).
+        Langsung berikan elemen HTML-nya agar bisa langsung dirender di web.
+        `;
+
+        const result = await model.generateContent(promptSystem);
+        let responseText = result.response.text();
+        
+        // Membersihkan output AI kalau-kalau ada markdown yang bocor
+        responseText = responseText.replace(/```html/gi, '').replace(/```/g, '').trim();
+
+        // Kirim hasil HTML kembali ke frontend materi.html
+        res.status(200).json({
+            kontenHtml: responseText
         });
 
-        // 5. JIKA OPENROUTER MENOLAK
-        if (!response.ok) {
-            const errData = await response.json();
-            return res.status(500).json({ 
-                error: `OPENROUTER_DITOLAK: ${errData.error?.message || 'Server AI penuh/mati.'}` 
-            });
-        }
-
-        const data = await response.json();
-
-        // 6. JIKA BERHASIL MENDAPATKAN TEKS
-        if (data.choices && data.choices.length > 0) {
-            let responseText = data.choices[0].message.content;
-            
-            // Pembersihan markdown yang sering bocor dari AI
-            responseText = responseText.replace(/```html/gi, '').replace(/```/g, '').trim();
-
-            return res.status(200).json({ kontenHtml: responseText });
-        } else {
-            return res.status(500).json({ error: "AI_KOSONG: AI merespons tapi tidak ada teksnya." });
-        }
-
     } catch (error) {
-        return res.status(500).json({ error: `SISTEM_CRASH: ${error.message}` });
+        console.error('Error saat memanggil AI Gemini:', error);
+        res.status(500).json({ 
+            error: 'AI sedang sibuk atau terjadi kesalahan internal.',
+            details: error.message
+        });
     }
-}
+};
