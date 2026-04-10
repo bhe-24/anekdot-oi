@@ -203,17 +203,41 @@
         </div>
     </div>
 
-    <script>
+  <script>
         document.addEventListener('DOMContentLoaded', () => {
             const userName = sessionStorage.getItem('userName');
             if (!userName) {
+                // Jika belum login, tendang ke depan
                 window.location.href = 'index.html';
                 return;
             }
             document.getElementById('namaUser').textContent = userName;
 
-            fetchMateriAPI();
+            // CEK APAKAH MATERI SUDAH ADA DI SESSION STORAGE
+            const materiTersimpan = sessionStorage.getItem('materiAnekdot');
+            
+            if (materiTersimpan) {
+                // Jika sudah ada, langsung tampilkan tanpa panggil API
+                tampilkanMateri(materiTersimpan);
+            } else {
+                // Jika belum ada, panggil Guru (API)
+                fetchMateriAPI();
+            }
         });
+
+        // Fungsi khusus untuk menampilkan materi ke layar
+        function tampilkanMateri(kontenHtml) {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const materiContent = document.getElementById('materiContent');
+            const audioBar = document.getElementById('audioBar');
+
+            loadingState.style.display = 'none';
+            errorState.style.display = 'none';
+            materiContent.innerHTML = kontenHtml;
+            materiContent.style.display = 'block';
+            audioBar.style.display = 'block';
+        }
 
         async function fetchMateriAPI() {
             const loadingState = document.getElementById('loadingState');
@@ -221,7 +245,7 @@
             const materiContent = document.getElementById('materiContent');
             const audioBar = document.getElementById('audioBar');
             
-            // Reset Tampilan
+            // Reset Tampilan ke Loading
             loadingState.style.display = 'flex';
             errorState.style.display = 'none';
             materiContent.style.display = 'none';
@@ -233,7 +257,7 @@
             };
 
             try {
-                // MENGHUBUNGI VERCEL API SECARA PAKSA (Tidak ada fallback offline)
+                // Menghubungi API
                 const response = await fetch('/api/materi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -244,11 +268,11 @@
 
                 const data = await response.json();
                 
-                // Jika Berhasil: Tampilkan Materi dan Audio
-                loadingState.style.display = 'none';
-                materiContent.innerHTML = data.kontenHtml;
-                materiContent.style.display = 'block';
-                audioBar.style.display = 'block';
+                // SIMPAN MATERI KE SESSION STORAGE AGAR TIDAK LOAD ULANG NANTI
+                sessionStorage.setItem('materiAnekdot', data.kontenHtml);
+                
+                // Tampilkan materi
+                tampilkanMateri(data.kontenHtml);
 
             } catch (error) {
                 console.error('Koneksi ke API Vercel/Gemini gagal:', error);
