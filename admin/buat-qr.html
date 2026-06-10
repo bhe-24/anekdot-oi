@@ -432,7 +432,7 @@
         };
 
         // ==========================================
-        // FITUR ARSIP DENGAN JAVASCRIPT SORTING
+        // FITUR ARSIP DENGAN JAVASCRIPT SORTING SECARA AMAN
         // ==========================================
         window.loadArsip = async function() {
             const listDiv = document.getElementById('arsipList');
@@ -442,7 +442,7 @@
             await ensureAuth();
 
             try {
-                // Fetch seluruh data tanpa query kompleks, lalu urutkan di memori
+                // Fetch seluruh data tanpa query kompleks
                 const querySnapshot = await getDocs(getQrCollection());
                 
                 let dataArray = [];
@@ -450,18 +450,40 @@
                     dataArray.push({ id: docSnap.id, ...docSnap.data() });
                 });
 
-                // Urutkan Terbaru ke Terlama (Descending)
-                dataArray.sort((a, b) => {
-                    const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
-                    const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
-                    return timeB - timeA;
-                });
+                // Fungsi pembantu untuk konversi waktu aman (Timestamp / Plain Object / JS Date / Null)
+                const getMillis = (dateField) => {
+                    if (!dateField) return 0;
+                    if (typeof dateField.toMillis === 'function') return dateField.toMillis();
+                    if (typeof dateField.toDate === 'function') return dateField.toDate().getTime();
+                    if (dateField.seconds) return dateField.seconds * 1000;
+                    if (dateField instanceof Date) return dateField.getTime();
+                    return 0;
+                };
+
+                // Urutkan Terbaru ke Terlama (Descending) secara aman
+                dataArray.sort((a, b) => getMillis(b.createdAt) - getMillis(a.createdAt));
                 
                 if(dataArray.length === 0) {
                     listDiv.innerHTML = '<p style="text-align:center; color:#64748b;">Belum ada arsip permainan QR.</p>';
                 } else {
                     dataArray.forEach((data) => {
-                        const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : 'Baru saja';
+                        // Fungsi pembantu untuk memformat tanggal secara aman tanpa merusak rendering loop
+                        const formatDate = (dateField) => {
+                            if (!dateField) return 'Baru saja';
+                            let jsDate;
+                            if (typeof dateField.toDate === 'function') {
+                                jsDate = dateField.toDate();
+                            } else if (dateField.seconds) {
+                                jsDate = new Date(dateField.seconds * 1000);
+                            } else if (dateField instanceof Date) {
+                                jsDate = dateField;
+                            } else {
+                                return 'Baru saja';
+                            }
+                            return jsDate.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+                        };
+
+                        const date = formatDate(data.createdAt);
                         
                         let badgeClass = data.status === 'aktif' ? 'status-aktif' : 'status-tangguh';
                         let badgeText = data.status === 'aktif' ? 'Aktif' : 'Ditangguhkan';
@@ -470,8 +492,8 @@
                             <div class="arsip-card" id="card-${data.id}">
                                 <div class="arsip-header">
                                     <div>
-                                        <div class="arsip-title">${data.judul}</div>
-                                        <div class="arsip-topic"><i class="fa-solid fa-tag"></i> Topik: ${data.topik}</div>
+                                        <div class="arsip-title">${data.judul || 'Tanpa Judul'}</div>
+                                        <div class="arsip-topic"><i class="fa-solid fa-tag"></i> Topik: ${data.topik || 'Umum'}</div>
                                         <div class="arsip-date"><i class="fa-regular fa-calendar"></i> Dibuat: ${date}</div>
                                     </div>
                                     <span class="badge-status ${badgeClass}">${badgeText}</span>
