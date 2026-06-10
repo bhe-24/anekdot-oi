@@ -202,7 +202,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary" id="btnSimpan"><i class="fa-solid fa-floppy-disk"></i> Simpan & Buat Kode QR</button>
+                <button type="submit" class="btn-primary" id="btnSimpan"><i class="fa-solid fa-floppy-disk"></i> Simpan & Buat QR</button>
             </form>
 
             <div class="loader" id="loadingForm"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p>Memproses data dan mengompres gambar...</p></div>
@@ -273,7 +273,7 @@
             }
         };
 
-        // Global functions accessible from HTML
+        // Global functions (Perbaikan switchTab agar mengaktifkan tab arsip secara visual)
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
@@ -283,7 +283,7 @@
                 document.getElementById('tab-form').classList.add('active');
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('tab-form').classList.remove('active');
+                document.getElementById('tab-arsip').classList.add('active'); // MEMPERBAIKI KENDALA LAYAR BLANK
                 loadArsip();
             }
         };
@@ -361,10 +361,17 @@
                     payload.createdAt = serverTimestamp();
                     const docRef = await addDoc(getQrCollection(), payload);
                     finalDocId = docRef.id;
-                    document.getElementById('docId').value = finalDocId;
                 }
 
+                // 1. Generate QR Code ke dalam Canvas visual
                 generateQRWithCanvas(finalDocId, topik);
+
+                // 2. FORM RESET OTOMATIS: Pengosongan field input setelah submit sukses
+                document.getElementById('qrForm').reset();
+                document.getElementById('docId').value = '';
+                document.querySelectorAll('.image-preview-container img').forEach(img => { img.src = ''; img.style.display = 'none'; });
+                document.querySelectorAll('.image-preview-placeholder').forEach(p => p.style.display = 'block');
+                document.querySelectorAll('.base64-struktur').forEach(inp => inp.value = '');
                 
             } catch (error) {
                 console.error("Error saving data: ", error);
@@ -464,7 +471,7 @@
                 dataArray.sort((a, b) => getMillis(b.createdAt) - getMillis(a.createdAt));
                 
                 if(dataArray.length === 0) {
-                    listDiv.innerHTML = '<p style="text-align:center; color:#64748b;">Belum ada arsip permainan QR.</p>';
+                    listDiv.innerHTML = '<p style="text-align:center; color:#64748b; padding: 20px 0;">Belum ada arsip permainan QR.</p>';
                 } else {
                     dataArray.forEach((data) => {
                         // Fungsi pembantu untuk memformat tanggal secara aman tanpa merusak rendering loop
