@@ -144,7 +144,6 @@
 
                 <!-- Container Struktur -->
                 <div id="strukturContainer">
-                    <!-- Abstraksi -->
                     <div class="struktur-card" data-struktur="Abstraksi">
                         <div class="struktur-title">Bagian 1: Abstraksi</div>
                         <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Abstraksi..."></textarea>
@@ -158,7 +157,6 @@
                         <input type="hidden" class="base64-struktur" id="base64-abstraksi">
                     </div>
 
-                    <!-- Orientasi -->
                     <div class="struktur-card" data-struktur="Orientasi">
                         <div class="struktur-title">Bagian 2: Orientasi</div>
                         <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Orientasi..."></textarea>
@@ -170,7 +168,6 @@
                         <input type="hidden" class="base64-struktur" id="base64-orientasi">
                     </div>
 
-                    <!-- Krisis -->
                     <div class="struktur-card" data-struktur="Krisis">
                         <div class="struktur-title">Bagian 3: Krisis</div>
                         <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Krisis..."></textarea>
@@ -182,7 +179,6 @@
                         <input type="hidden" class="base64-struktur" id="base64-krisis">
                     </div>
 
-                    <!-- Reaksi -->
                     <div class="struktur-card" data-struktur="Reaksi">
                         <div class="struktur-title">Bagian 4: Reaksi</div>
                         <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Reaksi..."></textarea>
@@ -194,7 +190,6 @@
                         <input type="hidden" class="base64-struktur" id="base64-reaksi">
                     </div>
 
-                    <!-- Koda -->
                     <div class="struktur-card" data-struktur="Koda">
                         <div class="struktur-title">Bagian 5: Koda</div>
                         <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Koda..."></textarea>
@@ -238,9 +233,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase (Sama dengan dashboard)
         const firebaseConfig = {
             apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
             authDomain: "juararc-503f9.firebaseapp.com",
@@ -252,8 +247,31 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
-        const COLLECTION_NAME = "qr_games_anekdot";
+        
+        // Ambil APP ID dari Env/Canvas secara dinamis
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // Fungsi untuk mengambil referensi koleksi sesuai aturan ketat Firebase
+        const getQrCollection = () => collection(db, 'artifacts', appId, 'public', 'data', 'qr_games_anekdot');
+        const getQrDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'qr_games_anekdot', id);
+
+        // Memastikan Autentikasi Anonim sukses sebelum Firebase query berjalan
+        let isAuthReady = false;
+        const ensureAuth = async () => {
+            if(isAuthReady) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token).catch(() => signInAnonymously(auth));
+                } else {
+                    await signInAnonymously(auth);
+                }
+                isAuthReady = true;
+            } catch (err) {
+                console.error("Auth init failed:", err);
+            }
+        };
 
         // Global functions accessible from HTML
         window.switchTab = function(tabName) {
@@ -279,7 +297,6 @@
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = function() {
-                        // Kompresi ukuran max 600px width agar base64 tidak terlalu besar untuk Firestore (Max 1MB per doc)
                         const canvas = document.createElement('canvas');
                         const MAX_WIDTH = 600;
                         let width = img.width;
@@ -294,14 +311,12 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // Kualitas kompresi jpeg 0.7
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                         
                         document.getElementById(previewId).src = dataUrl;
                         document.getElementById(previewId).style.display = 'block';
                         document.getElementById(placeholderId).style.display = 'none';
                         
-                        // Simpan string base64 di input hidden sebelah file input
                         input.nextElementSibling.value = dataUrl;
                     }
                     img.src = e.target.result;
@@ -317,12 +332,13 @@
             document.getElementById('loadingForm').style.display = 'block';
             document.getElementById('qrResultArea').style.display = 'none';
 
+            await ensureAuth();
+
             const docIdInput = document.getElementById('docId').value;
             const judul = document.getElementById('judul').value;
             const topik = document.getElementById('topik').value;
             const teksUtama = document.getElementById('teksUtama').value;
 
-            // Kumpulkan data struktur
             const strukturData = [];
             const cards = document.querySelectorAll('.struktur-card');
             cards.forEach(card => {
@@ -340,12 +356,10 @@
             try {
                 let finalDocId = docIdInput;
                 if(docIdInput) {
-                    // Update eksisting
-                    await updateDoc(doc(db, COLLECTION_NAME, docIdInput), payload);
+                    await updateDoc(getQrDoc(docIdInput), payload);
                 } else {
-                    // Buat baru
                     payload.createdAt = serverTimestamp();
-                    const docRef = await addDoc(collection(db, COLLECTION_NAME), payload);
+                    const docRef = await addDoc(getQrCollection(), payload);
                     finalDocId = docRef.id;
                     document.getElementById('docId').value = finalDocId;
                 }
@@ -362,13 +376,9 @@
         });
 
         function generateQRWithCanvas(docId, topikText) {
-            // Data QR hanya berisi Object JSON ringan berupa ID dokumen
-            // Data gambar base64 tersimpan di database agar aman dari batas limit QR Code
             const qrData = JSON.stringify({ id: docId, type: "anekdot_game" });
-            
             document.getElementById('rawQr').innerHTML = '';
             
-            // Generate QR Raw
             const qrcode = new QRCode(document.getElementById("rawQr"), {
                 text: qrData,
                 width: 300, height: 300,
@@ -376,33 +386,25 @@
                 correctLevel : QRCode.CorrectLevel.H
             });
 
-            // Tunggu sebentar sampai QR selesai di-render
             setTimeout(() => {
                 const rawCanvas = document.querySelector('#rawQr canvas');
                 const finalCanvas = document.getElementById('finalQrCanvas');
                 const ctx = finalCanvas.getContext('2d');
 
-                // Fill background putih
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-
-                // Gambar QR di tengah atas
                 ctx.drawImage(rawCanvas, 50, 30, 300, 300);
 
-                // Tulis Topik di bawah QR
                 ctx.font = 'bold 24px Poppins, Arial, sans-serif';
                 ctx.fillStyle = '#1e293b';
                 ctx.textAlign = 'center';
                 ctx.fillText("Topik: " + topikText.toUpperCase(), 200, 370);
                 
-                // Instruksi kecil
                 ctx.font = '14px Arial, sans-serif';
                 ctx.fillStyle = '#64748b';
                 ctx.fillText("Scan untuk memulai permainan", 200, 400);
 
                 document.getElementById('qrResultArea').style.display = 'block';
-                
-                // Scroll to result
                 document.getElementById('qrResultArea').scrollIntoView({ behavior: 'smooth' });
             }, 300);
         }
@@ -430,30 +432,42 @@
         };
 
         // ==========================================
-        // FITUR ARSIP
+        // FITUR ARSIP DENGAN JAVASCRIPT SORTING
         // ==========================================
         window.loadArsip = async function() {
             const listDiv = document.getElementById('arsipList');
             document.getElementById('loadingArsip').style.display = 'block';
             listDiv.innerHTML = '';
 
+            await ensureAuth();
+
             try {
-                const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
+                // Fetch seluruh data tanpa query kompleks, lalu urutkan di memori
+                const querySnapshot = await getDocs(getQrCollection());
                 
-                if(querySnapshot.empty) {
+                let dataArray = [];
+                querySnapshot.forEach((docSnap) => {
+                    dataArray.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Urutkan Terbaru ke Terlama (Descending)
+                dataArray.sort((a, b) => {
+                    const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+                    const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return timeB - timeA;
+                });
+                
+                if(dataArray.length === 0) {
                     listDiv.innerHTML = '<p style="text-align:center; color:#64748b;">Belum ada arsip permainan QR.</p>';
                 } else {
-                    querySnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        const id = docSnap.id;
+                    dataArray.forEach((data) => {
                         const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : 'Baru saja';
                         
                         let badgeClass = data.status === 'aktif' ? 'status-aktif' : 'status-tangguh';
                         let badgeText = data.status === 'aktif' ? 'Aktif' : 'Ditangguhkan';
 
                         const card = `
-                            <div class="arsip-card" id="card-${id}">
+                            <div class="arsip-card" id="card-${data.id}">
                                 <div class="arsip-header">
                                     <div>
                                         <div class="arsip-title">${data.judul}</div>
@@ -463,9 +477,9 @@
                                     <span class="badge-status ${badgeClass}">${badgeText}</span>
                                 </div>
                                 <div class="arsip-actions">
-                                    <button class="btn-action btn-edit" onclick="editData('${id}')"><i class="fa-solid fa-pen"></i> Edit / Lihat</button>
-                                    <button class="btn-action btn-tangguh" onclick="toggleStatus('${id}', '${data.status}')"><i class="fa-solid fa-power-off"></i> ${data.status === 'aktif' ? 'Tangguhkan' : 'Aktifkan'}</button>
-                                    <button class="btn-action btn-hapus" onclick="hapusData('${id}')"><i class="fa-solid fa-trash"></i> Hapus</button>
+                                    <button class="btn-action btn-edit" onclick="editData('${data.id}')"><i class="fa-solid fa-pen"></i> Edit / Lihat</button>
+                                    <button class="btn-action btn-tangguh" onclick="toggleStatus('${data.id}', '${data.status}')"><i class="fa-solid fa-power-off"></i> ${data.status === 'aktif' ? 'Tangguhkan' : 'Aktifkan'}</button>
+                                    <button class="btn-action btn-hapus" onclick="hapusData('${data.id}')"><i class="fa-solid fa-trash"></i> Hapus</button>
                                 </div>
                             </div>
                         `;
@@ -480,11 +494,11 @@
             }
         };
 
-        // Menjadikan fungsi arsip tersedia di global
         window.hapusData = async function(id) {
             if(confirm('Peringatan: Menghapus data ini akan membuat kode QR yang sudah dicetak tidak bisa digunakan lagi oleh siswa. Yakin ingin menghapus?')) {
+                await ensureAuth();
                 try {
-                    await deleteDoc(doc(db, COLLECTION_NAME, id));
+                    await deleteDoc(getQrDoc(id));
                     document.getElementById(`card-${id}`).remove();
                 } catch(e) { alert("Gagal menghapus."); }
             }
@@ -494,9 +508,10 @@
             const newStatus = currentStatus === 'aktif' ? 'tangguh' : 'aktif';
             const msg = newStatus === 'tangguh' ? 'Menangguhkan akan membuat QR ini terkunci dan tidak bisa dimainkan siswa. Lanjutkan?' : 'Aktifkan kembali QR ini agar bisa dimainkan?';
             if(confirm(msg)) {
+                await ensureAuth();
                 try {
-                    await updateDoc(doc(db, COLLECTION_NAME, id), { status: newStatus });
-                    loadArsip(); // Refresh list
+                    await updateDoc(getQrDoc(id), { status: newStatus });
+                    loadArsip();
                 } catch(e) { alert("Gagal mengubah status."); }
             }
         };
@@ -507,11 +522,11 @@
             document.getElementById('btnSimpan').style.display = 'none';
             document.getElementById('qrResultArea').style.display = 'none';
 
+            await ensureAuth();
+
             try {
-                // Untuk kesederhanaan, kita ambil data dari snapshot di memori jika memungkinkan, 
-                // tapi karena bisa di-refresh, kita baca ulang dari DB.
                 const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
-                const docSnap = await getDoc(doc(db, COLLECTION_NAME, id));
+                const docSnap = await getDoc(getQrDoc(id));
                 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -520,9 +535,8 @@
                     document.getElementById('topik').value = data.topik || '';
                     document.getElementById('teksUtama').value = data.teksUtama || '';
 
-                    // Isi ulang struktur
                     const cards = document.querySelectorAll('.struktur-card');
-                    cards.forEach((card, index) => {
+                    cards.forEach((card) => {
                         const strukData = data.struktur.find(s => s.namaStruktur === card.getAttribute('data-struktur'));
                         if(strukData) {
                             card.querySelector('.teks-struktur').value = strukData.teks || '';
@@ -543,7 +557,6 @@
                         }
                     });
                     
-                    // Generate ulang QR visual untuk diunduh (karena ID nya sama)
                     generateQRWithCanvas(id, data.topik);
                 }
             } catch (error) {
