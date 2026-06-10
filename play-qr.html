@@ -88,7 +88,7 @@
         
         .question-image {
             width: 100%; max-height: 200px; object-fit: contain; border-radius: 10px; margin-bottom: 15px;
-            display: none; /* Disembunyikan jika tidak ada gambar */
+            display: none;
         }
         
         .question-text { font-size: 15px; color: #1e293b; font-weight: 500; font-style: italic; line-height: 1.6; }
@@ -131,7 +131,7 @@
                     <p style="color: #64748b; font-size: 13px;">Mengunduh data dari kode QR</p>
                 </div>
                 
-                <!-- Dialog Error Kustom (Pengganti alert agar tidak crash di iframe) -->
+                <!-- Dialog Error Kustom -->
                 <div id="loading-error" style="display: none; padding: 20px; background: #fef2f2; border: 1px dashed #ef4444; border-radius: 12px; max-width: 90%;">
                     <i class="fa-solid fa-triangle-exclamation" style="font-size: 40px; color: #ef4444; margin-bottom: 10px;"></i>
                     <h4 style="color: #991b1b; font-weight: 700; margin-bottom: 5px;" id="errorTitle">Akses Ditolak</h4>
@@ -167,9 +167,7 @@
                     <div class="question-text" id="qText">Memuat potongan teks...</div>
                 </div>
 
-                <div class="options-grid" id="optionsContainer">
-                    <!-- Tombol pilihan digenerate via JS -->
-                </div>
+                <div class="options-grid" id="optionsContainer"></div>
             </div>
 
             <!-- SCREEN 4: HASIL AKHIR & INTEGRASI DATABASE -->
@@ -194,6 +192,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -206,7 +205,11 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Ambil APP ID yang sesuai dengan konfigurasi Admin
+        const appId = (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id').replace(/[\/\.]/g, '_');
 
         // State Variabel
         let gameData = null;
@@ -214,12 +217,10 @@
         let currentQIndex = 0;
         let score = 0;
         let timerInterval;
-        const TOTAL_TIME = 180; // 3 Menit (180 detik)
+        const TOTAL_TIME = 180; // 3 Menit
 
-        // Daftar nama struktur paten
         const strukturPaten = ["Abstraksi", "Orientasi", "Krisis", "Reaksi", "Koda"];
 
-        // DOM Elements
         const screens = {
             loading: document.getElementById('screen-loading'),
             reading: document.getElementById('screen-reading'),
@@ -227,14 +228,28 @@
             result: document.getElementById('screen-result')
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Cek Auth Siswa secara aman
+        // Memastikan Autentikasi Anonim sukses
+        let isAuthReady = false;
+        const ensureAuth = async () => {
+            if(isAuthReady) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token).catch(() => signInAnonymously(auth));
+                } else {
+                    await signInAnonymously(auth);
+                }
+                isAuthReady = true;
+            } catch (err) {
+                console.error("Auth init failed:", err);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
             if (!sessionStorage.getItem('userID')) {
                 showCustomError("Akses Terkunci", "Kamu harus masuk/login terlebih dahulu untuk bermain.", "index.html");
                 return;
             }
 
-            // Ambil ID dokumen dari URL
             const urlParams = new URLSearchParams(window.location.search);
             const gameId = urlParams.get('id');
 
@@ -243,11 +258,10 @@
                 return;
             }
 
-            // Mulai Fetch Data dari Firebase
+            await ensureAuth(); // Autentikasi sebelum baca data
             fetchGameData(gameId);
         });
 
-        // Tampilkan Error Kustom Tanpa alert()
         function showCustomError(title, msg, redirectUrl) {
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('loading-error').style.display = 'block';
@@ -256,18 +270,15 @@
             document.getElementById('errorRedirectBtn').href = redirectUrl;
         }
 
-        // ==========================================
-        // 1. FUNGSI FETCH DATA FIREBASE
-        // ==========================================
         async function fetchGameData(id) {
             try {
-                const docRef = doc(db, "qr_games_anekdot", id);
+                // JALUR PENCARIAN DIPERBARUI: Sesuai dengan jalur Admin (buat-qr.html)
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'qr_games_anekdot', id);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
                     gameData = docSnap.data();
                     
-                    // Cek jika ditangguhkan oleh admin
                     if(gameData.status === 'tangguh') {
                         showCustomError("QR Ditangguhkan", "Maaf, permainan ini sedang dinonaktifkan sementara oleh Guru/Admin.", "dashboard.html");
                         return;
@@ -283,19 +294,14 @@
             }
         }
 
-        // ==========================================
-        // 2. FASE MEMBACA & TIMER
-        // ==========================================
         function setupReadingPhase() {
             screens.loading.style.display = 'none';
             screens.reading.style.display = 'flex';
 
-            // Isi Data Teks Utuh
             document.getElementById('readTitle').textContent = gameData.judul;
             document.getElementById('readTopic').innerHTML = `<i class="fa-solid fa-tag"></i> Topik: ${gameData.topik}`;
             document.getElementById('readText').textContent = gameData.teksUtama;
 
-            // Setup Timer
             let timeLeft = TOTAL_TIME;
             const timerProgress = document.getElementById('timerProgress');
             const timerText = document.getElementById('timerText');
@@ -324,9 +330,6 @@
             });
         }
 
-        // ==========================================
-        // 3. FASE KUIS (ACAK STRUKTUR)
-        // ==========================================
         function startQuizPhase() {
             screens.reading.style.display = 'none';
             screens.quiz.style.display = 'flex';
@@ -384,7 +387,7 @@
             if(isCorrect) {
                 clickedBtn.classList.add('correct');
                 clickedBtn.innerHTML = `<span>${selectedAnswer}</span> <i class="fa-solid fa-circle-check"></i>`;
-                score += 10; // Setiap kartu berhasil menebak mendapatkan 10 poin
+                score += 10;
                 if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]);
             } else {
                 clickedBtn.classList.add('wrong');
@@ -410,9 +413,6 @@
             }, 1500);
         }
 
-        // ==========================================
-        // 4. FASE HASIL AKHIR & SAVE TO LEADERBOARD
-        // ==========================================
         async function finishGame() {
             screens.quiz.style.display = 'none';
             screens.result.style.display = 'flex';
@@ -422,7 +422,6 @@
             const msgEl = document.getElementById('finalMsg');
             const iconEl = document.querySelector('.result-icon');
 
-            // Ikon dinamis berdasarkan perolehan poin
             if(score >= 40) {
                 iconEl.className = "fa-solid fa-crown result-icon";
                 iconEl.style.color = "#fbbf24";
@@ -434,18 +433,16 @@
                 iconEl.style.color = "#64748b";
             }
 
-            // SIMPAN DATA KE FIREBASE LEADERBOARD SECARA REAL-TIME
             const currentUserID = sessionStorage.getItem('userID');
             if (currentUserID) {
                 try {
-                    // Cari dokumen siswa yang sedang login di users_session
+                    // Update skor di root users_session (Sesuai dengan kode leaderboard milikmu sebelumnya)
                     const q = query(collection(db, "users_session"), where("userID", "==", currentUserID));
                     const querySnapshot = await getDocs(q);
 
                     if (!querySnapshot.empty) {
                         const userDoc = querySnapshot.docs[0];
                         
-                        // Menambahkan skor baru ke skor lama yang sudah ada di database
                         await updateDoc(userDoc.ref, {
                             skor: increment(score)
                         });
