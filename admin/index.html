@@ -104,6 +104,41 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
+        /* Styling Khusus Captcha */
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        #captchaCanvas {
+            border-radius: 5px;
+            cursor: not-allowed;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-refresh {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .btn-refresh:hover {
+            background: #cbd5e1;
+            color: #1e293b;
+        }
+
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -128,8 +163,10 @@
         .error-msg {
             color: #ef4444;
             font-size: 13px;
-            margin-top: 10px;
+            margin-top: -10px;
+            margin-bottom: 15px;
             display: none;
+            font-weight: 500;
         }
 
         .back-link {
@@ -153,28 +190,44 @@
             <i class="fa-solid fa-user-shield"></i>
         </div>
         
-        <h1>Panel Admin</h1>
-        <p class="subtitle">Masuk untuk mengelola sistem Anekdot.io</p>
+        <h1>Verifikasi Akses Admin</h1>
+        <p class="subtitle">Sistem Keamanan Teks Anekdot Terenkripsi</p>
 
         <form id="adminLoginForm">
+            <!-- Input Nama Lengkap -->
             <div class="input-group">
                 <i class="fa-solid fa-user"></i>
-                <input type="text" id="username" placeholder="Username" required autocomplete="off">
+                <input type="text" id="namaLengkap" placeholder="Nama Lengkap" required autocomplete="off">
             </div>
             
+            <!-- Input NPM -->
             <div class="input-group">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" id="password" placeholder="Kata Sandi" required>
+                <i class="fa-solid fa-id-card"></i>
+                <input type="text" id="npm" placeholder="NPM Mahasiswa" required autocomplete="off">
             </div>
 
-            <div class="error-msg" id="errorMsg">Username atau kata sandi salah!</div>
+            <!-- Area Captcha -->
+            <div class="captcha-container">
+                <canvas id="captchaCanvas" width="160" height="45" title="Kode Verifikasi"></canvas>
+                <button type="button" class="btn-refresh" id="refreshCaptcha" title="Muat Ulang Captcha">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+
+            <!-- Input Jawaban Captcha -->
+            <div class="input-group">
+                <i class="fa-solid fa-shield-halved"></i>
+                <input type="text" id="captchaInput" placeholder="Masukkan Kode Verifikasi di atas" required autocomplete="off" maxlength="6">
+            </div>
+
+            <div class="error-msg" id="errorMsg">Nama, NPM, atau Kode Verifikasi salah!</div>
 
             <button type="submit" class="btn-submit">
-                Masuk ke Dashboard <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                Verifikasi & Masuk <i class="fa-solid fa-arrow-right-to-bracket"></i>
             </button>
         </form>
 
-        <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Kembali ke Halaman Siswa</a>
+        <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Kembali ke Halaman Utama</a>
     </div>
 
     <script>
@@ -186,35 +239,111 @@
 
             const loginForm = document.getElementById('adminLoginForm');
             const errorMsg = document.getElementById('errorMsg');
+            const captchaCanvas = document.getElementById('captchaCanvas');
+            const refreshCaptchaBtn = document.getElementById('refreshCaptcha');
+            
+            let currentCaptchaCode = '';
+
+            // Fungsi untuk membuat gambar Captcha
+            function generateCaptcha() {
+                const ctx = captchaCanvas.getContext('2d');
+                ctx.clearRect(0, 0, captchaCanvas.width, captchaCanvas.height);
+
+                // Background putih-abu
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, captchaCanvas.width, captchaCanvas.height);
+
+                // Karakter yang diizinkan (dihindari huruf yang mirip seperti O dan 0, I dan l)
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                currentCaptchaCode = '';
+                for (let i = 0; i < 5; i++) {
+                    currentCaptchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
+                // Tambahkan Garis Noise (Gangguan)
+                for(let i = 0; i < 6; i++) {
+                    ctx.strokeStyle = ['#cbd5e1', '#94a3b8', '#64748b'][Math.floor(Math.random()*3)];
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height);
+                    ctx.lineTo(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height);
+                    ctx.stroke();
+                }
+
+                // Tulis Teks Captcha
+                ctx.font = 'bold 26px Poppins, sans-serif';
+                ctx.fillStyle = '#1e293b';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Sedikit trik agar tulisan tidak terlalu lurus
+                ctx.setTransform(1, Math.random()*0.1 - 0.05, Math.random()*0.1 - 0.05, 1, 0, 0);
+                ctx.fillText(currentCaptchaCode, captchaCanvas.width / 2, captchaCanvas.height / 2 + 2);
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+
+                // Tambahkan Titik Noise
+                for(let i = 0; i < 40; i++) {
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height, 1, 0, 2*Math.PI);
+                    ctx.fill();
+                }
+            }
+
+            // Generate Captcha pertama kali halaman dimuat
+            generateCaptcha();
+
+            // Generate ulang saat tombol refresh ditekan
+            refreshCaptchaBtn.addEventListener('click', generateCaptcha);
 
             loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
-                const userVal = document.getElementById('username').value.trim();
-                const passVal = document.getElementById('password').value.trim();
+                const namaVal = document.getElementById('namaLengkap').value.trim();
+                const npmVal = document.getElementById('npm').value.trim();
+                const captchaVal = document.getElementById('captchaInput').value.trim().toUpperCase();
 
-                // Kredensial statis untuk prototipe (Username: admin, Password: cendekia2026)
-                if (userVal === 'admin' && passVal === 'cendekia2026') {
-                    // Sembunyikan pesan error jika sebelumnya muncul
+                // -----------------------------------------------------------------
+                // GANTI NAMA DAN NPM DI SINI UNTUK KREDENSIAL LOGIN ADMIN
+                // -----------------------------------------------------------------
+                const NAMA_ADMIN = "Bayu"; // Nama Lengkap
+                const NPM_ADMIN = "2410301004";     
+                const NAMA_ADMIN = "Devana"; // Nama Lengkap
+                const NPM_ADMIN = "2430301151";// NPM Mahasiswa
+                // -----------------------------------------------------------------
+
+                // Validasi Captcha Terlebih Dahulu
+                if (captchaVal !== currentCaptchaCode) {
+                    showError("Kode verifikasi (Captcha) salah!");
+                    document.getElementById('captchaInput').value = '';
+                    generateCaptcha(); // Refresh captcha jika salah
+                    return;
+                }
+
+                // Validasi Nama dan NPM
+                // Menggunakan toLowerCase agar pencarian nama tidak sensitif huruf besar/kecil
+                if (namaVal.toLowerCase() === NAMA_ADMIN.toLowerCase() && npmVal === NPM_ADMIN) {
                     errorMsg.style.display = 'none';
-                    
-                    // Simpan status login di Session Storage
                     sessionStorage.setItem('adminLoggedIn', 'true');
-                    
-                    // Arahkan ke dashboard admin
                     window.location.href = 'dashboard.html';
                 } else {
-                    // Tampilkan pesan error
-                    errorMsg.style.display = 'block';
-                    
-                    // Animasi getar sedikit untuk memberi tahu ada yang salah
-                    const card = document.querySelector('.login-card');
-                    card.style.transform = 'translateX(-10px)';
-                    setTimeout(() => card.style.transform = 'translateX(10px)', 100);
-                    setTimeout(() => card.style.transform = 'translateX(-10px)', 200);
-                    setTimeout(() => card.style.transform = 'translateX(0)', 300);
+                    showError("Nama Lengkap atau NPM tidak terdaftar sebagai Admin!");
+                    document.getElementById('captchaInput').value = '';
+                    generateCaptcha(); // Refresh captcha untuk keamanan tambahan
                 }
             });
+
+            function showError(message) {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+                
+                // Animasi getar sedikit
+                const card = document.querySelector('.login-card');
+                card.style.transform = 'translateX(-10px)';
+                setTimeout(() => card.style.transform = 'translateX(10px)', 100);
+                setTimeout(() => card.style.transform = 'translateX(-10px)', 200);
+                setTimeout(() => card.style.transform = 'translateX(0)', 300);
+            }
         });
     </script>
 </body>
