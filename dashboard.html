@@ -214,6 +214,18 @@
             right: 15px; opacity: 1; color: #3b82f6;
         }
 
+        /* Tombol Khusus Scan QR */
+        .qr-btn {
+            border: 2px dashed #10b981;
+            background: #ecfdf5;
+        }
+        .qr-btn:hover {
+            border-color: #059669;
+            background: #d1fae5;
+            box-shadow: 0 12px 25px rgba(16, 185, 129, 0.2);
+        }
+        .qr-btn:hover::after { color: #10b981; }
+
         .menu-icon {
             width: 48px;
             height: 48px;
@@ -229,6 +241,7 @@
 
         .menu-btn:hover .menu-icon { transform: scale(1.1) rotate(-5deg); }
 
+        .icon-qr { background: linear-gradient(135deg, #10b981, #34d399); color: #fff; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
         .icon-belajar { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7; }
         .icon-challenge { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; }
         .icon-materi { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
@@ -323,6 +336,15 @@
                 <i class="fa-solid fa-gamepad" style="color: #3b82f6;"></i> Arena Belajar
             </h3>
             <div class="menu-grid">
+                <!-- TOMBOL BARU UNTUK SCAN QR -->
+                <a href="scan-qr.html" class="menu-btn qr-btn">
+                    <div class="menu-icon icon-qr"><i class="fa-solid fa-qrcode"></i></div>
+                    <div class="menu-text">
+                        <h4 style="color: #065f46;">Scan QR Permainan</h4>
+                        <span>Pindai kartu dari guru untuk mulai bermain!</span>
+                    </div>
+                </a>
+
                 <a href="belajar.html" class="menu-btn">
                     <div class="menu-icon icon-belajar"><i class="fa-solid fa-layer-group"></i></div>
                     <div class="menu-text">
