@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anekdot.io - Bermain</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(circle at top right, #e0f2fe 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, #fce7f3 0%, transparent 40%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh;
+            background: rgba(255, 255, 255, 0.8); box-shadow: 0 0 40px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; overflow-x: hidden; position: relative;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            padding: 15px 20px; display: flex; justify-content: center; align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05); position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .app-title {
+            font-weight: 800; font-size: 18px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+
+        /* Layar Loading & Error Kustom */
+        #screen-loading {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex-grow: 1; height: 100%; text-align: center;
+        }
+        .spinner { font-size: 40px; color: #10b981; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Layar Membaca */
+        #screen-reading { display: none; flex-direction: column; }
+        
+        .timer-bar {
+            background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px;
+        }
+        .timer-progress {
+            background: #10b981; height: 100%; width: 100%; transition: width 1s linear;
+        }
+        .timer-text { text-align: center; font-weight: 700; color: #ef4444; margin-bottom: 20px; font-size: 18px; }
+
+        .story-card {
+            background: white; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 20px; border: 1px solid #f1f5f9;
+        }
+        .story-title { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 5px; }
+        .story-topic { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 15px; }
+        .story-text { font-size: 14px; line-height: 1.8; color: #334155; white-space: pre-line; }
+
+        .btn-skip {
+            width: 100%; padding: 15px; background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 15px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2);
+        }
+        .btn-skip:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(59, 130, 246, 0.3); }
+
+        /* Layar Kuis */
+        #screen-quiz { display: none; flex-direction: column; }
+        
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .question-counter { font-weight: 700; color: #64748b; font-size: 14px; }
+        .score-display { font-weight: 800; color: #10b981; font-size: 16px; background: #dcfce7; padding: 5px 12px; border-radius: 8px;}
+
+        .question-card {
+            background: white; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 20px; text-align: center; border: 2px solid #e2e8f0;
+        }
+        
+        .question-image {
+            width: 100%; max-height: 200px; object-fit: contain; border-radius: 10px; margin-bottom: 15px;
+            display: none; /* Disembunyikan jika tidak ada gambar */
+        }
+        
+        .question-text { font-size: 15px; color: #1e293b; font-weight: 500; font-style: italic; line-height: 1.6; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .btn-option {
+            background: white; border: 2px solid #cbd5e1; padding: 14px; border-radius: 12px;
+            font-size: 15px; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.2s;
+            text-align: left; display: flex; align-items: center; justify-content: space-between;
+        }
+        .btn-option:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+        
+        .btn-option.correct { background: #10b981; border-color: #10b981; color: white; }
+        .btn-option.wrong { background: #ef4444; border-color: #ef4444; color: white; }
+
+        /* Layar Hasil */
+        #screen-result { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-top: 50px;}
+        .result-icon { font-size: 60px; color: #fbbf24; margin-bottom: 15px; animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        .result-score { font-size: 60px; font-weight: 800; color: #10b981; line-height: 1; margin-bottom: 10px;}
+        .result-msg { font-size: 14px; color: #64748b; margin-bottom: 30px; line-height: 1.6; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="app-title"><i class="fa-solid fa-puzzle-piece"></i> Anekdot Challenge</div>
+        </header>
+
+        <main class="content">
+            
+            <!-- SCREEN 1: LOADING & ERROR HANDLING -->
+            <div id="screen-loading">
+                <div id="loading-spinner">
+                    <i class="fa-solid fa-circle-notch spinner"></i>
+                    <h3 style="color: #1e293b; font-weight: 700;">Menyiapkan Arena...</h3>
+                    <p style="color: #64748b; font-size: 13px;">Mengunduh data dari kode QR</p>
+                </div>
+                
+                <!-- Dialog Error Kustom (Pengganti alert agar tidak crash di iframe) -->
+                <div id="loading-error" style="display: none; padding: 20px; background: #fef2f2; border: 1px dashed #ef4444; border-radius: 12px; max-width: 90%;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 40px; color: #ef4444; margin-bottom: 10px;"></i>
+                    <h4 style="color: #991b1b; font-weight: 700; margin-bottom: 5px;" id="errorTitle">Akses Ditolak</h4>
+                    <p style="color: #b91c1c; font-size: 13px; margin-bottom: 15px;" id="errorMsgText">Pesan error...</p>
+                    <a href="dashboard.html" id="errorRedirectBtn" class="btn-skip" style="text-decoration: none; padding: 10px 15px; font-size: 13px; background: #ef4444; display: inline-block; width: auto; box-shadow: none;">Kembali</a>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: MEMBACA TEKS UTUH -->
+            <div id="screen-reading">
+                <div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div>
+                <div class="timer-text" id="timerText"><i class="fa-regular fa-clock"></i> 03:00</div>
+
+                <div class="story-card">
+                    <div class="story-title" id="readTitle">Memuat Judul...</div>
+                    <div class="story-topic" id="readTopic"><i class="fa-solid fa-tag"></i> Topik</div>
+                    <div class="story-text" id="readText">Memuat teks anekdot...</div>
+                </div>
+
+                <button class="btn-skip" id="btnSkipTimer">Selesai Membaca, Mulai Kuis! <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+
+            <!-- SCREEN 3: KUIS STRUKTUR (DIACAK) -->
+            <div id="screen-quiz">
+                <div class="quiz-header">
+                    <div class="question-counter">Soal <span id="qCurrent">1</span>/5</div>
+                    <div class="score-display"><i class="fa-solid fa-star"></i> Skor: <span id="qScore">0</span></div>
+                </div>
+
+                <div class="question-card">
+                    <h4 style="font-size: 13px; color: #64748b; margin-bottom: 15px; text-transform: uppercase; font-weight: 800;">Struktur Apakah Ini?</h4>
+                    <img id="qImage" class="question-image" src="" alt="Ilustrasi">
+                    <div class="question-text" id="qText">Memuat potongan teks...</div>
+                </div>
+
+                <div class="options-grid" id="optionsContainer">
+                    <!-- Tombol pilihan digenerate via JS -->
+                </div>
+            </div>
+
+            <!-- SCREEN 4: HASIL AKHIR & INTEGRASI DATABASE -->
+            <div id="screen-result">
+                <i class="fa-solid fa-trophy result-icon"></i>
+                <h2 style="font-weight: 800; font-size: 24px; color: #1e293b;">Permainan Selesai!</h2>
+                <div class="result-score" id="finalScore">+0</div>
+                <p class="result-msg" id="finalMsg">Menyimpan skor kamu ke leaderboard...</p>
+
+                <div style="width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <a href="leaderboard.html" class="btn-skip" style="text-decoration: none; text-align: center; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 15px rgba(16, 185, 129, 0.2);">
+                        <i class="fa-solid fa-trophy"></i> Lihat Papan Peringkat
+                    </a>
+                    <a href="dashboard.html" class="btn-skip" style="text-decoration: none; text-align: center; background: #64748b; box-shadow: none;">
+                        <i class="fa-solid fa-house"></i> Kembali ke Dashboard
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State Variabel
+        let gameData = null;
+        let shuffledQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let timerInterval;
+        const TOTAL_TIME = 180; // 3 Menit (180 detik)
+
+        // Daftar nama struktur paten
+        const strukturPaten = ["Abstraksi", "Orientasi", "Krisis", "Reaksi", "Koda"];
+
+        // DOM Elements
+        const screens = {
+            loading: document.getElementById('screen-loading'),
+            reading: document.getElementById('screen-reading'),
+            quiz: document.getElementById('screen-quiz'),
+            result: document.getElementById('screen-result')
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cek Auth Siswa secara aman
+            if (!sessionStorage.getItem('userID')) {
+                showCustomError("Akses Terkunci", "Kamu harus masuk/login terlebih dahulu untuk bermain.", "index.html");
+                return;
+            }
+
+            // Ambil ID dokumen dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameId = urlParams.get('id');
+
+            if (!gameId) {
+                showCustomError("QR Bermasalah", "ID Permainan tidak ditemukan dalam kode QR.", "dashboard.html");
+                return;
+            }
+
+            // Mulai Fetch Data dari Firebase
+            fetchGameData(gameId);
+        });
+
+        // Tampilkan Error Kustom Tanpa alert()
+        function showCustomError(title, msg, redirectUrl) {
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('loading-error').style.display = 'block';
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorMsgText').textContent = msg;
+            document.getElementById('errorRedirectBtn').href = redirectUrl;
+        }
+
+        // ==========================================
+        // 1. FUNGSI FETCH DATA FIREBASE
+        // ==========================================
+        async function fetchGameData(id) {
+            try {
+                const docRef = doc(db, "qr_games_anekdot", id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    gameData = docSnap.data();
+                    
+                    // Cek jika ditangguhkan oleh admin
+                    if(gameData.status === 'tangguh') {
+                        showCustomError("QR Ditangguhkan", "Maaf, permainan ini sedang dinonaktifkan sementara oleh Guru/Admin.", "dashboard.html");
+                        return;
+                    }
+
+                    setupReadingPhase();
+                } else {
+                    showCustomError("Data Tidak Ditemukan", "Permainan QR ini tidak terdaftar atau sudah dihapus oleh Admin.", "dashboard.html");
+                }
+            } catch (error) {
+                console.error("Error fetching doc:", error);
+                showCustomError("Koneksi Buruk", "Gagal mengunduh permainan. Periksa kembali internet kamu.", "dashboard.html");
+            }
+        }
+
+        // ==========================================
+        // 2. FASE MEMBACA & TIMER
+        // ==========================================
+        function setupReadingPhase() {
+            screens.loading.style.display = 'none';
+            screens.reading.style.display = 'flex';
+
+            // Isi Data Teks Utuh
+            document.getElementById('readTitle').textContent = gameData.judul;
+            document.getElementById('readTopic').innerHTML = `<i class="fa-solid fa-tag"></i> Topik: ${gameData.topik}`;
+            document.getElementById('readText').textContent = gameData.teksUtama;
+
+            // Setup Timer
+            let timeLeft = TOTAL_TIME;
+            const timerProgress = document.getElementById('timerProgress');
+            const timerText = document.getElementById('timerText');
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerText.innerHTML = `<i class="fa-regular fa-clock"></i> 0${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+                
+                const percentage = (timeLeft / TOTAL_TIME) * 100;
+                timerProgress.style.width = `${percentage}%`;
+
+                if(timeLeft <= 30) timerProgress.style.backgroundColor = '#ef4444';
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    startQuizPhase();
+                }
+            }, 1000);
+
+            document.getElementById('btnSkipTimer').addEventListener('click', () => {
+                clearInterval(timerInterval);
+                startQuizPhase();
+            });
+        }
+
+        // ==========================================
+        // 3. FASE KUIS (ACAK STRUKTUR)
+        // ==========================================
+        function startQuizPhase() {
+            screens.reading.style.display = 'none';
+            screens.quiz.style.display = 'flex';
+            window.scrollTo(0, 0);
+
+            let validQuestions = gameData.struktur.filter(s => s.teks && s.teks.trim() !== "");
+            shuffledQuestions = validQuestions.sort(() => Math.random() - 0.5);
+
+            if(shuffledQuestions.length === 0) {
+                showCustomError("Soal Kosong", "Admin belum mengisi rincian kuis untuk permainan ini.", "dashboard.html");
+                return;
+            }
+
+            currentQIndex = 0;
+            score = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = shuffledQuestions[currentQIndex];
+            
+            document.getElementById('qCurrent').textContent = currentQIndex + 1;
+            document.getElementById('qScore').textContent = score;
+
+            const imgEl = document.getElementById('qImage');
+            if(q.imageBase64 && q.imageBase64.trim() !== "") {
+                imgEl.src = q.imageBase64;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.src = '';
+                imgEl.style.display = 'none';
+            }
+
+            document.getElementById('qText').textContent = `"...${q.teks}..."`;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            strukturPaten.forEach(nama => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerHTML = `<span>${nama}</span> <i class="fa-regular fa-circle"></i>`;
+                
+                btn.onclick = () => checkAnswer(btn, nama, q.namaStruktur);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(clickedBtn, selectedAnswer, correctAnswer) {
+            const allBtns = document.querySelectorAll('.btn-option');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+            const isCorrect = (selectedAnswer === correctAnswer);
+
+            if(isCorrect) {
+                clickedBtn.classList.add('correct');
+                clickedBtn.innerHTML = `<span>${selectedAnswer}</span> <i class="fa-solid fa-circle-check"></i>`;
+                score += 10; // Setiap kartu berhasil menebak mendapatkan 10 poin
+                if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]);
+            } else {
+                clickedBtn.classList.add('wrong');
+                clickedBtn.innerHTML = `<span>${selectedAnswer}</span> <i class="fa-solid fa-circle-xmark"></i>`;
+                if ("vibrate" in navigator) navigator.vibrate([200]);
+                
+                allBtns.forEach(b => {
+                    if(b.textContent.trim() === correctAnswer) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            document.getElementById('qScore').textContent = score;
+
+            setTimeout(() => {
+                currentQIndex++;
+                if(currentQIndex < shuffledQuestions.length) {
+                    renderQuestion();
+                } else {
+                    finishGame();
+                }
+            }, 1500);
+        }
+
+        // ==========================================
+        // 4. FASE HASIL AKHIR & SAVE TO LEADERBOARD
+        // ==========================================
+        async function finishGame() {
+            screens.quiz.style.display = 'none';
+            screens.result.style.display = 'flex';
+
+            document.getElementById('finalScore').textContent = `+${score}`;
+
+            const msgEl = document.getElementById('finalMsg');
+            const iconEl = document.querySelector('.result-icon');
+
+            // Ikon dinamis berdasarkan perolehan poin
+            if(score >= 40) {
+                iconEl.className = "fa-solid fa-crown result-icon";
+                iconEl.style.color = "#fbbf24";
+            } else if(score >= 20) {
+                iconEl.className = "fa-solid fa-thumbs-up result-icon";
+                iconEl.style.color = "#3b82f6";
+            } else {
+                iconEl.className = "fa-solid fa-circle-info result-icon";
+                iconEl.style.color = "#64748b";
+            }
+
+            // SIMPAN DATA KE FIREBASE LEADERBOARD SECARA REAL-TIME
+            const currentUserID = sessionStorage.getItem('userID');
+            if (currentUserID) {
+                try {
+                    // Cari dokumen siswa yang sedang login di users_session
+                    const q = query(collection(db, "users_session"), where("userID", "==", currentUserID));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const userDoc = querySnapshot.docs[0];
+                        
+                        // Menambahkan skor baru ke skor lama yang sudah ada di database
+                        await updateDoc(userDoc.ref, {
+                            skor: increment(score)
+                        });
+
+                        msgEl.innerHTML = `<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Skor Berhasil Disimpan!</span><br>+${score} poin telah ditambahkan ke akumulasi akunmu.`;
+                    } else {
+                        msgEl.innerHTML = `<span style="color: #f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Sesi Tidak Ditemukan</span><br>Skor gagal diakumulasi ke leaderboard karena sesi tidak aktif.`;
+                    }
+                } catch (error) {
+                    console.error("Gagal menyimpan ke Firebase:", error);
+                    msgEl.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-wifi"></i> Gagal Sinkronisasi</span><br>Periksa internetmu untuk mengunggah poin.`;
+                }
+            } else {
+                msgEl.textContent = "Data pengguna tidak valid. Tidak bisa menyimpan skor.";
+            }
+        }
+    </script>
+</body>
+</html>
