@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anekdot.io - Buat QR Permainan</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Library untuk generate QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #f1f5f9; color: #334155; min-height: 100vh; padding-bottom: 50px; }
+        
+        .admin-container {
+            width: 100%; max-width: 800px; margin: 0 auto;
+            background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05); min-height: 100vh;
+        }
+
+        header {
+            background: #1e293b; color: white; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 10;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { color: white; text-decoration: none; font-size: 18px; }
+        .app-title { font-weight: 600; font-size: 16px; letter-spacing: 0.5px; }
+
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; background: #fff; }
+        .tab-btn {
+            flex: 1; padding: 15px; text-align: center; font-weight: 600; cursor: pointer;
+            color: #64748b; border: none; background: transparent; font-size: 14px;
+            transition: all 0.3s;
+        }
+        .tab-btn.active { color: #10b981; border-bottom: 3px solid #10b981; }
+
+        .content { padding: 20px; display: none; }
+        .content.active { display: block; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #475569; }
+        .form-control {
+            width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;
+            font-size: 14px; outline: none; transition: border 0.3s;
+        }
+        .form-control:focus { border-color: #10b981; }
+        textarea.form-control { min-height: 100px; resize: vertical; }
+
+        /* Struktur Anekdot Cards */
+        .struktur-card {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+            padding: 15px; margin-bottom: 15px;
+        }
+        .struktur-title { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 10px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px;}
+        
+        .image-preview-container {
+            width: 100%; height: 150px; border: 2px dashed #cbd5e1; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            background: #fff; cursor: pointer; position: relative; margin-top: 10px;
+        }
+        .image-preview-container img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        .image-preview-placeholder { text-align: center; color: #94a3b8; font-size: 12px; }
+        .image-preview-placeholder i { font-size: 24px; margin-bottom: 5px; }
+
+        .btn-primary {
+            background: #10b981; color: white; border: none; padding: 12px 20px;
+            border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;
+            transition: background 0.3s; font-size: 15px;
+        }
+        .btn-primary:hover { background: #059669; }
+        .btn-secondary { background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;}
+
+        /* QR Canvas Result */
+        .qr-result { text-align: center; margin-top: 30px; padding: 20px; background: #fff; border: 2px dashed #10b981; border-radius: 10px; display: none;}
+        #finalQrCanvas { max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; }
+        .btn-download { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;}
+
+        /* Archive List */
+        .arsip-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+        .arsip-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .arsip-title { font-weight: 600; font-size: 15px; color: #0f172a; }
+        .arsip-topic { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+        .arsip-date { font-size: 11px; color: #94a3b8; }
+        .badge-status { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+        .status-aktif { background: #dcfce7; color: #166534; }
+        .status-tangguh { background: #fef08a; color: #854d0e; }
+        
+        .arsip-actions { display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 10px;}
+        .btn-action { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;}
+        .btn-edit { background: #eff6ff; color: #3b82f6; }
+        .btn-tangguh { background: #fefce8; color: #ca8a04; }
+        .btn-hapus { background: #fef2f2; color: #ef4444; }
+
+        /* Loader */
+        .loader { display: none; text-align: center; padding: 20px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <div class="header-left">
+                <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+                <div class="app-title">QR Permainan Anekdot</div>
+            </div>
+            <div style="font-size: 14px;"><i class="fa-solid fa-qrcode" style="color: #10b981;"></i></div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('form')">Buat/Edit QR</button>
+            <button class="tab-btn" onclick="switchTab('arsip'); loadArsip();">Arsip Data</button>
+        </div>
+
+        <!-- TAB 1: FORM BUAT QR -->
+        <main class="content active" id="tab-form">
+            <form id="qrForm">
+                <input type="hidden" id="docId" value="">
+                
+                <div class="form-group">
+                    <label>Judul Permainan/Tugas</label>
+                    <input type="text" id="judul" class="form-control" placeholder="Contoh: Kuis Teks Anekdot Pertemuan 3" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Topik Permainan</label>
+                    <input type="text" id="topik" class="form-control" placeholder="Contoh: Politik, Hewan, Sekolah..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Materi Lengkap (Teks Anekdot Utuh)</label>
+                    <textarea id="teksUtama" class="form-control" placeholder="Masukkan teks anekdot secara utuh di sini..." required></textarea>
+                </div>
+
+                <hr style="border: 1px solid #e2e8f0; margin: 25px 0;">
+                <h4 style="margin-bottom: 15px; color: #0f172a;">Rincian Kartu Struktur (Teks & Ilustrasi Base64)</h4>
+
+                <!-- Container Struktur -->
+                <div id="strukturContainer">
+                    <!-- Abstraksi -->
+                    <div class="struktur-card" data-struktur="Abstraksi">
+                        <div class="struktur-title">Bagian 1: Abstraksi</div>
+                        <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Abstraksi..."></textarea>
+                        <div class="image-preview-container" onclick="document.getElementById('img-abstraksi').click()">
+                            <img id="preview-abstraksi" src="">
+                            <div class="image-preview-placeholder" id="placeholder-abstraksi">
+                                <i class="fa-solid fa-cloud-arrow-up"></i><br>Klik untuk unggah ilustrasi
+                            </div>
+                        </div>
+                        <input type="file" id="img-abstraksi" accept="image/*" style="display: none;" onchange="handleImageSelect(this, 'preview-abstraksi', 'placeholder-abstraksi')">
+                        <input type="hidden" class="base64-struktur" id="base64-abstraksi">
+                    </div>
+
+                    <!-- Orientasi -->
+                    <div class="struktur-card" data-struktur="Orientasi">
+                        <div class="struktur-title">Bagian 2: Orientasi</div>
+                        <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Orientasi..."></textarea>
+                        <div class="image-preview-container" onclick="document.getElementById('img-orientasi').click()">
+                            <img id="preview-orientasi" src="">
+                            <div class="image-preview-placeholder" id="placeholder-orientasi"><i class="fa-solid fa-cloud-arrow-up"></i><br>Klik untuk unggah ilustrasi</div>
+                        </div>
+                        <input type="file" id="img-orientasi" accept="image/*" style="display: none;" onchange="handleImageSelect(this, 'preview-orientasi', 'placeholder-orientasi')">
+                        <input type="hidden" class="base64-struktur" id="base64-orientasi">
+                    </div>
+
+                    <!-- Krisis -->
+                    <div class="struktur-card" data-struktur="Krisis">
+                        <div class="struktur-title">Bagian 3: Krisis</div>
+                        <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Krisis..."></textarea>
+                        <div class="image-preview-container" onclick="document.getElementById('img-krisis').click()">
+                            <img id="preview-krisis" src="">
+                            <div class="image-preview-placeholder" id="placeholder-krisis"><i class="fa-solid fa-cloud-arrow-up"></i><br>Klik untuk unggah ilustrasi</div>
+                        </div>
+                        <input type="file" id="img-krisis" accept="image/*" style="display: none;" onchange="handleImageSelect(this, 'preview-krisis', 'placeholder-krisis')">
+                        <input type="hidden" class="base64-struktur" id="base64-krisis">
+                    </div>
+
+                    <!-- Reaksi -->
+                    <div class="struktur-card" data-struktur="Reaksi">
+                        <div class="struktur-title">Bagian 4: Reaksi</div>
+                        <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Reaksi..."></textarea>
+                        <div class="image-preview-container" onclick="document.getElementById('img-reaksi').click()">
+                            <img id="preview-reaksi" src="">
+                            <div class="image-preview-placeholder" id="placeholder-reaksi"><i class="fa-solid fa-cloud-arrow-up"></i><br>Klik untuk unggah ilustrasi</div>
+                        </div>
+                        <input type="file" id="img-reaksi" accept="image/*" style="display: none;" onchange="handleImageSelect(this, 'preview-reaksi', 'placeholder-reaksi')">
+                        <input type="hidden" class="base64-struktur" id="base64-reaksi">
+                    </div>
+
+                    <!-- Koda -->
+                    <div class="struktur-card" data-struktur="Koda">
+                        <div class="struktur-title">Bagian 5: Koda</div>
+                        <textarea class="form-control teks-struktur" placeholder="Potongan teks untuk Koda..."></textarea>
+                        <div class="image-preview-container" onclick="document.getElementById('img-koda').click()">
+                            <img id="preview-koda" src="">
+                            <div class="image-preview-placeholder" id="placeholder-koda"><i class="fa-solid fa-cloud-arrow-up"></i><br>Klik untuk unggah ilustrasi</div>
+                        </div>
+                        <input type="file" id="img-koda" accept="image/*" style="display: none;" onchange="handleImageSelect(this, 'preview-koda', 'placeholder-koda')">
+                        <input type="hidden" class="base64-struktur" id="base64-koda">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btnSimpan"><i class="fa-solid fa-floppy-disk"></i> Simpan & Buat Kode QR</button>
+            </form>
+
+            <div class="loader" id="loadingForm"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p>Memproses data dan mengompres gambar...</p></div>
+
+            <div class="qr-result" id="qrResultArea">
+                <h4 style="margin-bottom: 10px; color:#0f172a;">QR Code Berhasil Dibuat!</h4>
+                <p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Semua teks dan gambar (Base64) telah tersimpan di database. Kode QR ini mengarah ke ID data tersebut.</p>
+                
+                <!-- Div tersembunyi untuk generate QR mentah -->
+                <div id="rawQr" style="display:none;"></div>
+                
+                <!-- Canvas final tempat menggabungkan QR dan Teks Topik -->
+                <canvas id="finalQrCanvas" width="400" height="450"></canvas><br>
+                
+                <button class="btn-download" onclick="downloadCanvas()"><i class="fa-solid fa-download"></i> Unduh QR (PNG)</button>
+                <button class="btn-secondary" style="margin-left: 10px;" onclick="resetForm()">Buat Baru</button>
+            </div>
+        </main>
+
+        <!-- TAB 2: ARSIP DATA -->
+        <main class="content" id="tab-arsip">
+            <div class="loader" id="loadingArsip" style="display: block;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p>Memuat Arsip...</p></div>
+            <div id="arsipList">
+                <!-- Data arsip akan muncul di sini -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase (Sama dengan dashboard)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhLMOes8_bVkE22fh2a_pQWiytG3RZY0Q",
+            authDomain: "juararc-503f9.firebaseapp.com",
+            projectId: "juararc-503f9",
+            storageBucket: "juararc-503f9.firebasestorage.app",
+            messagingSenderId: "306187241171",
+            appId: "1:306187241171:web:70285c8b2643acd0533626",
+            measurementId: "G-8PFY3WW9XL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const COLLECTION_NAME = "qr_games_anekdot";
+
+        // Global functions accessible from HTML
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
+            
+            if(tabName === 'form') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-form').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-form').classList.remove('active');
+                loadArsip();
+            }
+        };
+
+        // Fungsi Kompresi Gambar ke Base64 menggunakan Canvas
+        window.handleImageSelect = function(input, previewId, placeholderId) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Kompresi ukuran max 600px width agar base64 tidak terlalu besar untuk Firestore (Max 1MB per doc)
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Kualitas kompresi jpeg 0.7
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        
+                        document.getElementById(previewId).src = dataUrl;
+                        document.getElementById(previewId).style.display = 'block';
+                        document.getElementById(placeholderId).style.display = 'none';
+                        
+                        // Simpan string base64 di input hidden sebelah file input
+                        input.nextElementSibling.value = dataUrl;
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Simpan Data & Buat QR
+        document.getElementById('qrForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('btnSimpan').style.display = 'none';
+            document.getElementById('loadingForm').style.display = 'block';
+            document.getElementById('qrResultArea').style.display = 'none';
+
+            const docIdInput = document.getElementById('docId').value;
+            const judul = document.getElementById('judul').value;
+            const topik = document.getElementById('topik').value;
+            const teksUtama = document.getElementById('teksUtama').value;
+
+            // Kumpulkan data struktur
+            const strukturData = [];
+            const cards = document.querySelectorAll('.struktur-card');
+            cards.forEach(card => {
+                const namaStruktur = card.getAttribute('data-struktur');
+                const teks = card.querySelector('.teks-struktur').value;
+                const base64 = card.querySelector('.base64-struktur').value;
+                strukturData.push({ namaStruktur, teks, imageBase64: base64 });
+            });
+
+            const payload = {
+                judul, topik, teksUtama, struktur: strukturData,
+                status: 'aktif', updatedAt: serverTimestamp()
+            };
+
+            try {
+                let finalDocId = docIdInput;
+                if(docIdInput) {
+                    // Update eksisting
+                    await updateDoc(doc(db, COLLECTION_NAME, docIdInput), payload);
+                } else {
+                    // Buat baru
+                    payload.createdAt = serverTimestamp();
+                    const docRef = await addDoc(collection(db, COLLECTION_NAME), payload);
+                    finalDocId = docRef.id;
+                    document.getElementById('docId').value = finalDocId;
+                }
+
+                generateQRWithCanvas(finalDocId, topik);
+                
+            } catch (error) {
+                console.error("Error saving data: ", error);
+                alert("Gagal menyimpan data ke server.");
+            } finally {
+                document.getElementById('btnSimpan').style.display = 'block';
+                document.getElementById('loadingForm').style.display = 'none';
+            }
+        });
+
+        function generateQRWithCanvas(docId, topikText) {
+            // Data QR hanya berisi Object JSON ringan berupa ID dokumen
+            // Data gambar base64 tersimpan di database agar aman dari batas limit QR Code
+            const qrData = JSON.stringify({ id: docId, type: "anekdot_game" });
+            
+            document.getElementById('rawQr').innerHTML = '';
+            
+            // Generate QR Raw
+            const qrcode = new QRCode(document.getElementById("rawQr"), {
+                text: qrData,
+                width: 300, height: 300,
+                colorDark : "#000000", colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // Tunggu sebentar sampai QR selesai di-render
+            setTimeout(() => {
+                const rawCanvas = document.querySelector('#rawQr canvas');
+                const finalCanvas = document.getElementById('finalQrCanvas');
+                const ctx = finalCanvas.getContext('2d');
+
+                // Fill background putih
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+                // Gambar QR di tengah atas
+                ctx.drawImage(rawCanvas, 50, 30, 300, 300);
+
+                // Tulis Topik di bawah QR
+                ctx.font = 'bold 24px Poppins, Arial, sans-serif';
+                ctx.fillStyle = '#1e293b';
+                ctx.textAlign = 'center';
+                ctx.fillText("Topik: " + topikText.toUpperCase(), 200, 370);
+                
+                // Instruksi kecil
+                ctx.font = '14px Arial, sans-serif';
+                ctx.fillStyle = '#64748b';
+                ctx.fillText("Scan untuk memulai permainan", 200, 400);
+
+                document.getElementById('qrResultArea').style.display = 'block';
+                
+                // Scroll to result
+                document.getElementById('qrResultArea').scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
+
+        window.downloadCanvas = function() {
+            const canvas = document.getElementById('finalQrCanvas');
+            const topik = document.getElementById('topik').value.replace(/\s+/g, '-').toLowerCase();
+            const url = canvas.toDataURL("image/png");
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `QR-Anekdot-${topik}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+
+        window.resetForm = function() {
+            document.getElementById('qrForm').reset();
+            document.getElementById('docId').value = '';
+            document.querySelectorAll('.image-preview-container img').forEach(img => { img.src = ''; img.style.display = 'none'; });
+            document.querySelectorAll('.image-preview-placeholder').forEach(p => p.style.display = 'block');
+            document.querySelectorAll('.base64-struktur').forEach(inp => inp.value = '');
+            document.getElementById('qrResultArea').style.display = 'none';
+            window.scrollTo(0,0);
+        };
+
+        // ==========================================
+        // FITUR ARSIP
+        // ==========================================
+        window.loadArsip = async function() {
+            const listDiv = document.getElementById('arsipList');
+            document.getElementById('loadingArsip').style.display = 'block';
+            listDiv.innerHTML = '';
+
+            try {
+                const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if(querySnapshot.empty) {
+                    listDiv.innerHTML = '<p style="text-align:center; color:#64748b;">Belum ada arsip permainan QR.</p>';
+                } else {
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const id = docSnap.id;
+                        const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : 'Baru saja';
+                        
+                        let badgeClass = data.status === 'aktif' ? 'status-aktif' : 'status-tangguh';
+                        let badgeText = data.status === 'aktif' ? 'Aktif' : 'Ditangguhkan';
+
+                        const card = `
+                            <div class="arsip-card" id="card-${id}">
+                                <div class="arsip-header">
+                                    <div>
+                                        <div class="arsip-title">${data.judul}</div>
+                                        <div class="arsip-topic"><i class="fa-solid fa-tag"></i> Topik: ${data.topik}</div>
+                                        <div class="arsip-date"><i class="fa-regular fa-calendar"></i> Dibuat: ${date}</div>
+                                    </div>
+                                    <span class="badge-status ${badgeClass}">${badgeText}</span>
+                                </div>
+                                <div class="arsip-actions">
+                                    <button class="btn-action btn-edit" onclick="editData('${id}')"><i class="fa-solid fa-pen"></i> Edit / Lihat</button>
+                                    <button class="btn-action btn-tangguh" onclick="toggleStatus('${id}', '${data.status}')"><i class="fa-solid fa-power-off"></i> ${data.status === 'aktif' ? 'Tangguhkan' : 'Aktifkan'}</button>
+                                    <button class="btn-action btn-hapus" onclick="hapusData('${id}')"><i class="fa-solid fa-trash"></i> Hapus</button>
+                                </div>
+                            </div>
+                        `;
+                        listDiv.innerHTML += card;
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading arsip:", error);
+                listDiv.innerHTML = '<p style="text-align:center; color:#ef4444;">Gagal memuat arsip.</p>';
+            } finally {
+                document.getElementById('loadingArsip').style.display = 'none';
+            }
+        };
+
+        // Menjadikan fungsi arsip tersedia di global
+        window.hapusData = async function(id) {
+            if(confirm('Peringatan: Menghapus data ini akan membuat kode QR yang sudah dicetak tidak bisa digunakan lagi oleh siswa. Yakin ingin menghapus?')) {
+                try {
+                    await deleteDoc(doc(db, COLLECTION_NAME, id));
+                    document.getElementById(`card-${id}`).remove();
+                } catch(e) { alert("Gagal menghapus."); }
+            }
+        };
+
+        window.toggleStatus = async function(id, currentStatus) {
+            const newStatus = currentStatus === 'aktif' ? 'tangguh' : 'aktif';
+            const msg = newStatus === 'tangguh' ? 'Menangguhkan akan membuat QR ini terkunci dan tidak bisa dimainkan siswa. Lanjutkan?' : 'Aktifkan kembali QR ini agar bisa dimainkan?';
+            if(confirm(msg)) {
+                try {
+                    await updateDoc(doc(db, COLLECTION_NAME, id), { status: newStatus });
+                    loadArsip(); // Refresh list
+                } catch(e) { alert("Gagal mengubah status."); }
+            }
+        };
+
+        window.editData = async function(id) {
+            switchTab('form');
+            document.getElementById('loadingForm').style.display = 'block';
+            document.getElementById('btnSimpan').style.display = 'none';
+            document.getElementById('qrResultArea').style.display = 'none';
+
+            try {
+                // Untuk kesederhanaan, kita ambil data dari snapshot di memori jika memungkinkan, 
+                // tapi karena bisa di-refresh, kita baca ulang dari DB.
+                const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+                const docSnap = await getDoc(doc(db, COLLECTION_NAME, id));
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('docId').value = id;
+                    document.getElementById('judul').value = data.judul || '';
+                    document.getElementById('topik').value = data.topik || '';
+                    document.getElementById('teksUtama').value = data.teksUtama || '';
+
+                    // Isi ulang struktur
+                    const cards = document.querySelectorAll('.struktur-card');
+                    cards.forEach((card, index) => {
+                        const strukData = data.struktur.find(s => s.namaStruktur === card.getAttribute('data-struktur'));
+                        if(strukData) {
+                            card.querySelector('.teks-struktur').value = strukData.teks || '';
+                            card.querySelector('.base64-struktur').value = strukData.imageBase64 || '';
+                            
+                            const imgPreview = card.querySelector('img');
+                            const placeholder = card.querySelector('.image-preview-placeholder');
+                            
+                            if(strukData.imageBase64) {
+                                imgPreview.src = strukData.imageBase64;
+                                imgPreview.style.display = 'block';
+                                placeholder.style.display = 'none';
+                            } else {
+                                imgPreview.src = '';
+                                imgPreview.style.display = 'none';
+                                placeholder.style.display = 'block';
+                            }
+                        }
+                    });
+                    
+                    // Generate ulang QR visual untuk diunduh (karena ID nya sama)
+                    generateQRWithCanvas(id, data.topik);
+                }
+            } catch (error) {
+                alert("Gagal memuat detail data.");
+            } finally {
+                document.getElementById('loadingForm').style.display = 'none';
+                document.getElementById('btnSimpan').style.display = 'block';
+            }
+        };
+
+    </script>
+</body>
+</html>
