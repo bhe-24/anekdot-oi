@@ -250,8 +250,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Ambil APP ID dari Env/Canvas secara dinamis
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Ambil APP ID dari Env/Canvas secara dinamis dan ganti garis miring (slash) untuk mencegah error Firestore path
+        const appId = (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id').replace(/[\/\.]/g, '_');
         
         // Fungsi untuk mengambil referensi koleksi sesuai aturan ketat Firebase
         const getQrCollection = () => collection(db, 'artifacts', appId, 'public', 'data', 'qr_games_anekdot');
