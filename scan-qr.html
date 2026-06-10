@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anekdot.io - Scan QR Permainan</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Library HTML5 QR Code Scanner -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #0f172a; /* Latar belakang gelap agar fokus ke kamera */
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #0f172a;
+            position: relative;
+            display: flex;
+            flex-direction: column; 
+            overflow-x: hidden;
+        }
+
+        /* HEADER Transparan */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 50;
+            background: linear-gradient(to bottom, rgba(15,23,42,0.9), transparent);
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .header-title {
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        /* AREA SCANNER */
+        .scanner-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            margin-top: -60px; /* Menarik ke atas sedikit menutupi ruang kosong header */
+        }
+
+        /* Container Kamera */
+        #reader {
+            width: 100%;
+            max-width: 350px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3), 0 20px 40px rgba(0,0,0,0.5);
+            background: #1e293b;
+            position: relative;
+        }
+
+        /* Menghilangkan elemen UI default dari library yang tidak perlu */
+        #reader button {
+            background: #3b82f6 !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 15px !important;
+            border-radius: 8px !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 600 !important;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        #reader select {
+            padding: 8px; border-radius: 6px; font-family: 'Poppins', sans-serif;
+            margin-bottom: 10px; width: 100%; max-width: 250px;
+        }
+        #reader a { display: none !important; }
+
+        /* Animasi Garis Scan / Laser */
+        .scan-laser {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #10b981;
+            box-shadow: 0 0 15px 5px rgba(16, 185, 129, 0.5);
+            z-index: 10;
+            animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            display: none; /* Disembunyikan sampai kamera aktif */
+        }
+
+        @keyframes scan {
+            0% { top: 10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 90%; opacity: 0; }
+        }
+
+        /* Bingkai sudut */
+        .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: #10b981;
+            border-style: solid;
+            z-index: 5;
+            transition: all 0.3s;
+        }
+        .corner-tl { top: 15px; left: 15px; border-width: 4px 0 0 4px; border-top-left-radius: 10px; }
+        .corner-tr { top: 15px; right: 15px; border-width: 4px 4px 0 0; border-top-right-radius: 10px; }
+        .corner-bl { bottom: 15px; left: 15px; border-width: 0 0 4px 4px; border-bottom-left-radius: 10px; }
+        .corner-br { bottom: 15px; right: 15px; border-width: 0 4px 4px 0; border-bottom-right-radius: 10px; }
+
+        /* Status Text */
+        .scan-status {
+            margin-top: 30px;
+            text-align: center;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 15px 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .scan-status h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 5px;
+        }
+
+        .scan-status p {
+            font-size: 13px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        /* Overlay Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .loading-icon {
+            font-size: 50px;
+            color: #10b981;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); text-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+            to { transform: scale(1.1); text-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Scan QR Permainan</div>
+            <div style="width: 40px;"></div> <!-- Spacer agar judul di tengah -->
+        </header>
+
+        <main class="scanner-wrapper">
+            <div style="position: relative; width: 100%; max-width: 350px;">
+                <!-- Bingkai sudut estetis -->
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <!-- Garis animasi laser -->
+                <div class="scan-laser" id="laser"></div>
+                
+                <!-- Area Kamera Library HTML5-QRCode -->
+                <div id="reader"></div>
+            </div>
+
+            <div class="scan-status" id="statusBox">
+                <h3><i class="fa-solid fa-camera"></i> Siapkan Kamera</h3>
+                <p>Arahkan kamera ponselmu ke kode QR yang diberikan oleh guru.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Layar Loading Transisi -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <i class="fa-solid fa-check-circle loading-icon"></i>
+        <h2 style="font-weight: 700; margin-bottom: 5px;">QR Terdeteksi!</h2>
+        <p style="color: #cbd5e1; font-size: 14px;">Memuat permainan...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const html5QrCode = new Html5Qrcode("reader");
+            const laser = document.getElementById('laser');
+            const statusBox = document.getElementById('statusBox');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Konfigurasi Scanner
+            const config = { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0 
+            };
+
+            // Mulai Scanner
+            html5QrCode.start(
+                { facingMode: "environment" }, // Pakai kamera belakang jika ada
+                config,
+                onScanSuccess,
+                onScanFailure
+            )
+            .then(() => {
+                // Kamera berhasil diaktifkan
+                laser.style.display = 'block';
+                statusBox.innerHTML = `
+                    <h3><i class="fa-solid fa-qrcode"></i> Sedang Memindai...</h3>
+                    <p>Posisikan QR code di tengah area bingkai.</p>
+                `;
+            })
+            .catch((err) => {
+                // Kamera gagal/ditolak
+                statusBox.innerHTML = `
+                    <h3 style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Kamera Ditolak</h3>
+                    <p>Izinkan akses kamera di browser kamu untuk menggunakan fitur ini.</p>
+                `;
+                console.error("Camera Error: ", err);
+            });
+
+            // Ketika berhasil scan
+            function onScanSuccess(decodedText, decodedResult) {
+                // 1. Hentikan pemindaian agar tidak ter-scan berulang kali
+                html5QrCode.stop().then(() => {
+                    try {
+                        // 2. Cek apakah format teks QR adalah JSON buatan admin kita
+                        const data = JSON.parse(decodedText);
+                        
+                        if(data.type === "anekdot_game" && data.id) {
+                            // 3. Sukses! Tampilkan loading
+                            laser.style.display = 'none';
+                            loadingOverlay.style.display = 'flex';
+                            
+                            if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]); // Getar sukses
+                            
+                            // 4. Redirect ke halaman permainan dengan ID yang di-scan
+                            setTimeout(() => {
+                                window.location.href = `play-qr.html?id=${data.id}`;
+                            }, 1500);
+
+                        } else {
+                            handleInvalidQR();
+                        }
+                    } catch(e) {
+                        // Jika bukan JSON (misal scan QR sembarangan)
+                        handleInvalidQR();
+                    }
+                }).catch(err => {
+                    console.log("Gagal menghentikan scanner: ", err);
+                });
+            }
+
+            // Fungsi ini dipanggil berkali-kali selama gagal mendeteksi, jadi kita biarkan kosong agar tidak spam console.
+            function onScanFailure(error) {
+                // quiet failure
+            }
+
+            function handleInvalidQR() {
+                alert("Ups! Ini bukan Kode QR Permainan Anekdot yang valid.");
+                // Reload halaman untuk merestart scanner
+                window.location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
