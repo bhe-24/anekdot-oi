@@ -304,12 +304,12 @@
                 const captchaVal = document.getElementById('captchaInput').value.trim().toUpperCase();
 
                 // -----------------------------------------------------------------
-                // GANTI NAMA DAN NPM DI SINI UNTUK KREDENSIAL LOGIN ADMIN
+                // DAFTAR KREDENSIAL LOGIN ADMIN (Gunakan Array agar bisa banyak)
                 // -----------------------------------------------------------------
-                const NAMA_ADMIN = "Bayu"; // Nama Lengkap
-                const NPM_ADMIN = "2410301004";     
-                const NAMA_ADMIN = "Devana"; // Nama Lengkap
-                const NPM_ADMIN = "2430301151";// NPM Mahasiswa
+                const daftarAdmin = [
+                    { nama: "Bayu", npm: "2410301004" },
+                    { nama: "Devana", npm: "2430301151" }
+                ];
                 // -----------------------------------------------------------------
 
                 // Validasi Captcha Terlebih Dahulu
@@ -320,9 +320,12 @@
                     return;
                 }
 
-                // Validasi Nama dan NPM
-                // Menggunakan toLowerCase agar pencarian nama tidak sensitif huruf besar/kecil
-                if (namaVal.toLowerCase() === NAMA_ADMIN.toLowerCase() && npmVal === NPM_ADMIN) {
+                // Validasi Nama dan NPM (Mengecek apakah input cocok dengan salah satu di daftarAdmin)
+                const isAdminValid = daftarAdmin.some(admin => 
+                    admin.nama.toLowerCase() === namaVal.toLowerCase() && admin.npm === npmVal
+                );
+
+                if (isAdminValid) {
                     errorMsg.style.display = 'none';
                     sessionStorage.setItem('adminLoggedIn', 'true');
                     window.location.href = 'dashboard.html';
